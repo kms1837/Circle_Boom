@@ -20,26 +20,25 @@ Scene* TutorialScene::scene()
 
 bool TutorialScene::init()
 {
-    size = Director::getInstance()->getVisibleSize();
+    size = Director::getInstance()->getWinSize();
     
     Sprite* background = Sprite::create("background/Pbackground9.png");
     background->setPosition(size.width/2, size.height/2);
     addChild(background,1);
     
     Sprite* dong = Sprite::create("tutorial/tudong.png");
-    dong->setPosition(1000, size.height-420);
+    dong->setPosition(size.width/2 + 200, size.height/2);
     dong->setTag(DONGTAG);
     addChild(dong, 3);
     
     Sprite* spr_mal = Sprite::create("tutorial/mal.png");
-    spr_mal->setPosition(440, size.height-360);
+    spr_mal->setPosition(440, size.height/2);
     spr_mal->setTag(MALTAG);
     addChild(spr_mal, 3);
     
-    LabelTTF* txt_mal = LabelTTF::create(mal_txt[txtnum], "맑은 고딕", 30, CCSizeMake(550, 300), kCCTextAlignmentLeft);
-    
-    txt_mal->setPosition(spr_mal->getPositionX()-50, spr_mal->getPositionY()/2+60);
-    txt_mal->setColor(ccBLACK);
+    Label* txt_mal = Label::createWithTTF(mal_txt[txtnum], "font/NanumGothic.ttc", 30, Size(550, 300), TextHAlignment::LEFT);
+    txt_mal->setPosition(440, size.height/2);//Vec2(spr_mal->getPositionX()-50, spr_mal->getPositionY()/2+60));
+    txt_mal->setColor(Color3B::BLACK);
     txt_mal->setTag(TXTMALTAG);
     addChild(txt_mal, 4);
     
@@ -55,6 +54,7 @@ bool TutorialScene::init()
     listener->onTouchBegan = CC_CALLBACK_2(TutorialScene::onTouchBegan, this);
     listener->onTouchEnded = CC_CALLBACK_2(TutorialScene::onTouchEnded, this);
     listener->onTouchMoved = CC_CALLBACK_2(TutorialScene::onTouchMoved, this);
+    
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
     
     return true;
@@ -62,32 +62,29 @@ bool TutorialScene::init()
 
 #pragma mark- 터치이벤트
 
-void TutorialScene::touchesBegan(cocos2d::Set *touches, cocos2d::Event *event)
+bool TutorialScene::onTouchBegan(Touch* touch, Event* event)
 {
     if(touchnum==3){
-        SetIterator TouchPoint = touches->begin();
-        Touch* touch = (Touch*)(*TouchPoint);
-        Point location = touch->getLocation();
+        Vec2 location = touch->getLocation();
 
         mousecoordinate[coordinatecount][0] = location.x;
         mousecoordinate[coordinatecount][1] = location.y;
         
-        cocos2d::MotionStreak* streak = MotionStreak::create(0.5, 3, 10, ccWHITE, "paddle.png" );
+        cocos2d::MotionStreak* streak = MotionStreak::create(0.5, 3, 10, Color3B::WHITE, "paddle.png" );
         streak->setPosition(location.x,location.y);
         streak->setTag(STREAKTAG);
         addChild(streak,4);
         
         schedule(schedule_selector(TutorialScene::inCircle));
-        
     }
+    
+    return true;
 }
 
-void TutorialScene::touchesMoved(cocos2d::Set* touches, cocos2d::Event* event)
+void TutorialScene::onTouchMoved(Touch* touch, Event* event)
 {
     if(touchnum==3){
-        SetIterator TouchPoint = touches->begin();
-        Touch* touch = (Touch*)(*TouchPoint);
-        Point location = touch->getLocation();
+        Vec2 location = touch->getLocation();
         
         coordinatecount++;
         mousecoordinate[coordinatecount][0] = location.x;
@@ -97,11 +94,11 @@ void TutorialScene::touchesMoved(cocos2d::Set* touches, cocos2d::Event* event)
     }
 }
 
-void TutorialScene::touchesEnded(cocos2d::Set* touches, cocos2d::Event* event)
+void TutorialScene::onTouchEnded(Touch* touch, Event* event)
 {
     Objectcircle temp;
     Objectcircle::Circle* removeObject;
-    LabelTTF* temptxt = (LabelTTF*)getChildByTag(TXTMALTAG);
+    Label* temptxt = (Label*)getChildByTag(TXTMALTAG);
     switch (touchnum) {
         case 1: //대화넘기기
             temptxt->setString(mal_txt[txtnum]);
@@ -211,7 +208,7 @@ void TutorialScene::tutorialManagement(float dt)
             // mal_txt[3] = "먼저 게임의 기본 룰 입니다.";
             //
             if(txtnum>4){
-                Sprite* help_img = Sprite::create("tutoimg1.png");
+                Sprite* help_img = Sprite::create("tutorial/tutoimg1.png");
                 help_img->setTag(HELPIMGTAG);
                 help_img->setPosition(400, size.height-310);
                 addChild(help_img, 3);
@@ -249,7 +246,7 @@ void TutorialScene::tutorialManagement(float dt)
             // 클릭하면 터치가 활성화되고 직접해보게 된다.
             //
             
-            guid_img = Sprite::create("tempguidimg.png");
+            guid_img = Sprite::create("tutorial/tempguidimg.png");
             guid_img->setTag(GUIDIMGTAG);
             guid_img->setPosition(size.width/2, size.height/2-30);
             addChild(guid_img, 3);
@@ -299,7 +296,7 @@ void TutorialScene::tutorialManagement(float dt)
             //                      튜토리얼8
             // 튜토리얼 끝
             //
-            Director::sharedDirector()->replaceScene(TransitionFade::create(0.8, GameMain::scene()));
+            Director::getInstance()->replaceScene(TransitionFade::create(0.8, GameMain::scene()));
             tutonum++;
             break;
             

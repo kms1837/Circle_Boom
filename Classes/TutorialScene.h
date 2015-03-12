@@ -22,9 +22,9 @@ public:
     CREATE_FUNC(TutorialScene);
     
 private:
-    virtual void touchesBegan(cocos2d::Set *touches, cocos2d::Event* event);
-    virtual void touchesEnded(cocos2d::Set* touches, cocos2d::Event* event);
-    virtual void touchesMoved(cocos2d::Set* touches, cocos2d::Event* event);
+    virtual bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
+    virtual void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+    virtual void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
     void tutorialManagement(float dt);
     void inCircle(float dt);
     void inCircleColorChange(Objectcircle::Circle*  changeColorlist);

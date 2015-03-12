@@ -11,15 +11,15 @@ public:
     Playgame();
     
     virtual bool init();
-    virtual void touchesBegan(cocos2d::Set *touches, cocos2d::Event* event);
-    virtual void touchesMoved(cocos2d::Set* touches, cocos2d::Event* event);
-    virtual void touchesEnded(cocos2d::Set* touches, cocos2d::Event* event);
+    virtual void touchesBegan(cocos2d::__Set *touches, cocos2d::Event* event);
+    virtual void touchesMoved(cocos2d::__Set* touches, cocos2d::Event* event);
+    virtual void touchesEnded(cocos2d::__Set* touches, cocos2d::Event* event);
 
     static cocos2d::Scene* scene();
 
     void fristgamemmm();
     void boomParticles(int px, int py);
-    void menuClickCallback(cocos2d::Object* pSender);
+    void menuClickCallback(cocos2d::Ref* pSender);
     //void FadeCircle(int fadetemp, int colortemp);
     void FadeCircle();
     void gameover();
@@ -37,7 +37,7 @@ class GameStopLayer : public cocos2d::LayerColor
 {
 	public:
 		virtual void onEnter();
-		void StopClickCallback(cocos2d::Object* stopSender);
+		void StopClickCallback(cocos2d::Ref* stopSender);
 		CREATE_FUNC(GameStopLayer);
 };
 

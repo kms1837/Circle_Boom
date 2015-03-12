@@ -10,8 +10,8 @@ class gSelect: public cocos2d::LayerColor
 {
 	public:
     virtual bool init();
-	static cocos2d::CCScene* scene();
-	void menuClickCallback(cocos2d::Object* pSender);
+	static cocos2d::Scene* scene();
+	void menuClickCallback(cocos2d::Ref* pSender);
 	 CREATE_FUNC(gSelect);
 
 	private:

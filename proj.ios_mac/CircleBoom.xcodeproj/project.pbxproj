@@ -169,6 +169,8 @@
 		C3B866071AAF839C00B68965 /* Xbuttonpush.png in Resources */ = {isa = PBXBuildFile; fileRef = C3B865B71AAF839C00B68965 /* Xbuttonpush.png */; };
 		C3B866091AAF83CC00B68965 /* jack.png in Resources */ = {isa = PBXBuildFile; fileRef = C3B866081AAF83CC00B68965 /* jack.png */; };
 		C3B8660A1AAF83CC00B68965 /* jack.png in Resources */ = {isa = PBXBuildFile; fileRef = C3B866081AAF83CC00B68965 /* jack.png */; };
+		C3B866121AB18AA000B68965 /* font in Resources */ = {isa = PBXBuildFile; fileRef = C3B866111AB18AA000B68965 /* font */; };
+		C3B866131AB18AA100B68965 /* font in Resources */ = {isa = PBXBuildFile; fileRef = C3B866111AB18AA000B68965 /* font */; };
 		D44C620C132DFF330009C878 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D44C620B132DFF330009C878 /* OpenAL.framework */; };
 		D44C620E132DFF430009C878 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D44C620D132DFF430009C878 /* AVFoundation.framework */; };
 		D44C6210132DFF4E0009C878 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D44C620F132DFF4E0009C878 /* AudioToolbox.framework */; };
@@ -434,6 +436,7 @@
 		C3B865B61AAF839C00B68965 /* wbox2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wbox2.png; sourceTree = "<group>"; };
 		C3B865B71AAF839C00B68965 /* Xbuttonpush.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Xbuttonpush.png; sourceTree = "<group>"; };
 		C3B866081AAF83CC00B68965 /* jack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = jack.png; sourceTree = "<group>"; };
+		C3B866111AB18AA000B68965 /* font */ = {isa = PBXFileReference; lastKnownFileType = folder; path = font; sourceTree = "<group>"; };
 		D44C620B132DFF330009C878 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		D44C620D132DFF430009C878 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		D44C620F132DFF4E0009C878 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -638,6 +641,7 @@
 		78C7DDAA14EBA5050085D0C2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C3B866111AB18AA000B68965 /* font */,
 				C3B866081AAF83CC00B68965 /* jack.png */,
 				C3B865901AAF839C00B68965 /* 동그리설정.png */,
 				C3B865911AAF839C00B68965 /* backbutton.png */,
@@ -687,10 +691,12 @@
 		C39A44141AA8113A009796C0 /* Scene */ = {
 			isa = PBXGroup;
 			children = (
-				C39A43EF1AA81130009796C0 /* InGameScene.cpp */,
-				C39A43F01AA81130009796C0 /* InGameScene.h */,
+				C39A43DC1AA81130009796C0 /* IntroScene.cpp */,
+				C39A43DD1AA81130009796C0 /* IntroScene.h */,
 				C39A43F21AA81130009796C0 /* TutorialScene.cpp */,
 				C39A43F31AA81130009796C0 /* TutorialScene.h */,
+				C39A43EF1AA81130009796C0 /* InGameScene.cpp */,
+				C39A43F01AA81130009796C0 /* InGameScene.h */,
 				C39A43E21AA81130009796C0 /* gSelect.cpp */,
 				C39A43E31AA81130009796C0 /* gSelectScene.h */,
 				C39A43E41AA81130009796C0 /* ItemShopScene.cpp */,
@@ -701,8 +707,6 @@
 				C39A43DF1AA81130009796C0 /* MainScene.h */,
 				C39A43E01AA81130009796C0 /* OptionScene.cpp */,
 				C39A43E11AA81130009796C0 /* OptionScene.h */,
-				C39A43DC1AA81130009796C0 /* IntroScene.cpp */,
-				C39A43DD1AA81130009796C0 /* IntroScene.h */,
 				C39A43D81AA81130009796C0 /* GameMain.cpp */,
 				C39A43D91AA81130009796C0 /* GameMain.h */,
 			);
@@ -762,7 +766,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0610;
 				TargetAttributes = {
 					1D6058900D05DD3D006BFB54 = {
 						DevelopmentTeam = MDDB52YB8L;
@@ -878,6 +882,7 @@
 				C3B865FE1AAF839C00B68965 /* tempdong.ccbi in Resources */,
 				C3B865BE1AAF839C00B68965 /* cancelbutton.png in Resources */,
 				5087E78617EB970100C73F5D /* Icon-76.png in Resources */,
+				C3B866121AB18AA000B68965 /* font in Resources */,
 				C3B865E61AAF839C00B68965 /* nextbutton.png in Resources */,
 				C3B865FC1AAF839C00B68965 /* tempcircle.png in Resources */,
 				5087E77F17EB970100C73F5D /* Default@2x.png in Resources */,
@@ -946,6 +951,7 @@
 				C3B865EF1AAF839C00B68965 /* Particles in Resources */,
 				C3B865EB1AAF839C00B68965 /* other in Resources */,
 				C3B865F11AAF839C00B68965 /* playb.png in Resources */,
+				C3B866131AB18AA100B68965 /* font in Resources */,
 				C3B865D91AAF839C00B68965 /* gamestopb.png in Resources */,
 				C3B865F31AAF839C00B68965 /* pointercircle.png in Resources */,
 				C3B865CF1AAF839C00B68965 /* ExplodingRing.plist in Resources */,
@@ -1155,9 +1161,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1184,9 +1190,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = mac/Prefix.pch;

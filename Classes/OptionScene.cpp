@@ -17,7 +17,7 @@
 
 using namespace cocos2d;
 
-LabelTTF* optionScenetitle;
+Label* optionScenetitle;
 
 Scene* OptionScene::scene()
 {
@@ -32,7 +32,7 @@ Scene* OptionScene::scene()
 bool OptionScene::init()
 {
 	if( !LayerColor::initWithColor(Color4B(255, 80, 255, 100))) return false;
-	Size size = Director::sharedDirector()->getWinSize();
+	Size size = Director::getInstance()->getWinSize();
     /*
 	MenuItemImage *me1 = MenuItemImage::create("backbutton.png",
                                                "testbuttonpush.png",

@@ -37,9 +37,9 @@ public:
     
 private:
 	void MainCircleMoveLogic(float dt);
-    void MainClickCallback(cocos2d::Object* pSender);
-    void HelpClickCallback(cocos2d::Object* pSender);
-    void EndClickCallback(cocos2d::Object* pSender);
+    void MainClickCallback(cocos2d::Ref* pSender);
+    void HelpClickCallback(cocos2d::Ref* pSender);
+    void EndClickCallback(cocos2d::Ref* pSender);
     
 protected:
     int helpnum=1, maxhelpnum=3;

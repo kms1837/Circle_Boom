@@ -23,7 +23,7 @@ bool IntroScene::init(){
 	if( !LayerColor::initWithColor(Color4B(0, 0, 0, 0))) return false;
 	Size size = Director::getInstance()->getWinSize();
 	teammark = CCSprite::create("jack.png");
-	teammark->setPosition(size.width/2,size.height/2);
+	teammark->setPosition(size.width/2, size.height/2);
 	teammark->setOpacity(0);
 	addChild(teammark);
 	return true;
@@ -35,7 +35,7 @@ void IntroScene::onEnter()
 	teammark->runAction(CCSequence::create(FadeIn::create(1.0),
 										   DelayTime::create(1.0),
 										   FadeOut::create(1.0f),
-										   CallFunc::create(this, callfunc_selector(IntroScene::sceneReplace)),NULL));
+										   callfunc_selector(IntroScene::sceneReplace),NULL));
     //runAction
 }
 

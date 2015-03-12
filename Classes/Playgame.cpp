@@ -19,16 +19,16 @@ Sprite* ComboText;
 Sprite* Danger;
 Menu *gStopMenu;
 Menu *gGameoverMenu;
-LabelTTF* score;
-LabelTTF* plusscore;
-LabelTTF* pLabel;
-LabelTTF* ComboLabel;
-LabelTTF* stimeN;
-LabelTTF* ScorePlusLabel;
-LabelTTF* jum;
-LabelTTF* jum2;
-LabelTTF* jum3;
-LabelTTF* wincircle;
+Label* score;
+Label* plusscore;
+Label* pLabel;
+Label* ComboLabel;
+Label* stimeN;
+Label* ScorePlusLabel;
+Label* jum;
+Label* jum2;
+Label* jum3;
+Label* wincircle;
 Size size2;
 Sprite* overtext;//∞‘¿”ø¿πˆ±€¿⁄
 Sprite* backpopup;//≈¨∏ÆæÓ, ∞‘¿”ø¿πˆΩ√ ª˝±Ë
@@ -135,7 +135,7 @@ void Playgame::fristgamemmm(){ //∞‘¿” √ ±‚»≠ «‘ºˆ
 	gamestop=1;//∞‘¿”¿ª ¡§¡ˆ«‘(0-»∞º∫, 1-¡§¡ˆ)
 	explosionS=0; //±∏√º∆¯πﬂ Ω∫¿ßƒ°(0-¥Î±‚, 1-∆¯πﬂ∏º«¿Áª˝)
 	etimer=0; //∞≥√º∞£ ∆¯πﬂ∞£∞› Ω√∞£
-	explosionNum;
+	explosionNum=0;
 
 	comboS=0; //ƒﬁ∫∏Ω∫¿ßƒ°
 	combotimer=0; //ƒﬁ∫∏≈∏¿Ã∏”
@@ -149,7 +149,7 @@ void Playgame::fristgamemmm(){ //∞‘¿” √ ±‚»≠ «‘ºˆ
 	minute=0;//∫–(∫∏¿Ã¡ˆæ ¿Ω)
 
 	stimes=0; //¡§¡ˆ»ƒ ¥ŸΩ√ Ω««‡Ω√ 3√ ƒ´øÓ∆Æ∏¶ ¿ß«— ∫Øºˆ
-	stime; //ƒ´øÓ∆Æ«“ √ (∞‘¿”Ω√¿€Ω√ø°µµ ªÁøÎ)
+	stime=0; //ƒ´øÓ∆Æ«“ √ (∞‘¿”Ω√¿€Ω√ø°µµ ªÁøÎ)
 	stimer=0;
 
 	WScircletimer=0;//«œæ·ªˆ ±∏√º∞° ≥™ø¿¥¬ ≈∏¿Ã∏”
@@ -184,12 +184,12 @@ bool Playgame::init()
 
     fristgamemmm();
 
-    CocosDenshion::SimpleAudioEngine::sharedEngine()->preloadEffect("sound/SHORT_BGM_09.mp3");//πÃ∏Æ ∏ﬁ∏∏Æø° ø√∏≤
+    CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("sound/SHORT_BGM_09.mp3");//πÃ∏Æ ∏ﬁ∏∏Æø° ø√∏≤
 		
     if( !LayerColor::create(Color4B(255, 255, 255, 255)))return false;
 		
     size2 = Director::getInstance()->getWinSize();
-    m_Sae = CocosDenshion::SimpleAudioEngine::sharedEngine();
+    m_Sae = CocosDenshion::SimpleAudioEngine::getInstance();
 
     //∞‘¿”√ ±‚ºº∆√
     Danger = Sprite::create("Danger.png");
@@ -204,31 +204,31 @@ bool Playgame::init()
     //√πΩ√¿€Ω√ ƒ´øÓ∆Æ
     fristgame = 1;
     stime = 3;
-    stimeN = LabelTTF::create("3", "∏º¿∫ ∞ÌµÒ", 40);
+    stimeN = Label::createWithTTF("3", "∏º¿∫ ∞ÌµÒ", 40);
     stimeN->setPosition(size2.width/2,size2.height/2);
     addChild(stimeN,10);
     //
 
     //¿”Ω√ ¡°ºˆ∆«
-    jum = LabelTTF::create("sadasd", "Arial", 46.0);
+    jum = Label::createWithTTF("sadasd", "Arial", 46.0);
     jum->setPosition(size2.width/2+200,size2.height/2+90);
     jum->setColor(Color3B(0,0,0));
     addChild(jum,10);
     jum->setOpacity(0);
 
-    jum2 = LabelTTF::create("sadasd", "Arial", 46.0);
+    jum2 = Label::createWithTTF("sadasd", "Arial", 46.0);
     jum2->setPosition(size2.width/2+200,size2.height/2+13);
     jum2->setColor(Color3B(0,0,0));
     addChild(jum2,10);
     jum2->setOpacity(0);
 
-    jum3 = LabelTTF::create("sadasd", "Arial", 46.0);
+    jum3 = Label::createWithTTF("sadasd", "Arial", 46.0);
     jum3->setPosition(size2.width/2+200,size2.height/2-60);
     jum3->setColor(Color3B(0,0,0));
     addChild(jum3,10);
     jum3->setOpacity(0);
 
-    wincircle = LabelTTF::create("0", "∏º¿∫ ∞ÌµÒ", 60);
+    wincircle = Label::createWithTTF("0", "∏º¿∫ ∞ÌµÒ", 60);
     wincircle->setPosition(size2.width-40, 40);
     addChild(wincircle,2);
     //
@@ -239,7 +239,7 @@ bool Playgame::init()
     ComboText->setOpacity(0);
 
     //≈ÿΩ∫∆Æ
-    pLabel = LabelTTF::create("Ready?", "∏º¿∫ ∞ÌµÒ", 24);
+    pLabel = Label::createWithTTF("Ready?", "∏º¿∫ ∞ÌµÒ", 24);
     pLabel->setPosition(size2.width / 2, size2.height - 50);
     this->addChild(pLabel, 1);
     //
@@ -250,34 +250,32 @@ bool Playgame::init()
     this->addChild(pSprite, 0);
     //
 
-    LabelTTF* scorename = LabelTTF::create("score :", "∏º¿∫ ∞ÌµÒ", 20);
+    Label* scorename = Label::createWithTTF("score :", "∏º¿∫ ∞ÌµÒ", 20);
     scorename->setPosition(1120,720-30);
     addChild(scorename,2);
 
-    ComboLabel = LabelTTF::create("0 Combo","∏º¿∫ ∞ÌµÒ", 27); //ƒﬁ∫∏
+    ComboLabel = Label::createWithTTF("0 Combo","∏º¿∫ ∞ÌµÒ", 27); //ƒﬁ∫∏
     ComboLabel->setPosition(size2.width/2,size2.height/2);
     ComboLabel->setOpacity(0);
     addChild(ComboLabel,2);
 
-    ScorePlusLabel = LabelTTF::create("+0","∏º¿∫ ∞ÌµÒ", 20); //√ﬂ∞°µ»¡°ºˆ
+    ScorePlusLabel = Label::createWithTTF("+0","∏º¿∫ ∞ÌµÒ", 20); //√ﬂ∞°µ»¡°ºˆ
     ScorePlusLabel->setPosition(size2.width/2,size2.height/2-100);
     ScorePlusLabel->setOpacity(0);
     addChild(ScorePlusLabel,2);
 
-    score = LabelTTF::create("0", "∏º¿∫ ∞ÌµÒ", 20);
+    score = Label::createWithTTF("0", "∏º¿∫ ∞ÌµÒ", 20);
     score->setPosition(1200,720-30);
     addChild(score,2);
 
-    plusscore = LabelTTF::create("0", "∏º¿∫ ∞ÌµÒ", 20);
+    plusscore = Label::createWithTTF("0", "∏º¿∫ ∞ÌµÒ", 20);
     plusscore->setPosition(1200,720-50);
     plusscore->setOpacity(0);
     addChild(plusscore,2);
-
-    MenuItemImage *gme1 = MenuItemImage::create(
-                                                    "gamestopb.png",
-                                                    "gamestopb.png",
-                                                    this,
-                                                    menu_selector(Playgame::menuClickCallback));
+    
+    MenuItemImage *gme1 = MenuItemImage::create("gamestopb.png",
+                                                "gamestopb.png",
+                                                CC_CALLBACK_1(Playgame::menuClickCallback, this));
     Menu *gmnuMain = Menu::create(gme1, NULL);
 
     gme1->setTag(7);
@@ -285,24 +283,21 @@ bool Playgame::init()
     addChild(gmnuMain,2);
 
     ////////////////////////////////////////¡§¡ˆºº∆√
-
-    MenuItemImage *tempghomeb = MenuItemImage::create(//¿”Ω√
-                                                            "homebutton.png",
-                                                            "testbuttonpush.png",
-                                                            this,
-                                                            menu_selector(GameStopLayer::StopClickCallback));
+    /*
+    MenuItemImage *tempghomeb = MenuItemImage::create("homebutton.png",
+                                                      "testbuttonpush.png",
+                                                      CC_CALLBACK_1(GameStopLayer::StopClickCallback, this));
     tempghomeb->setTag(2);
-    MenuItemImage *gRetryb = MenuItemImage::create(
-                                                        "returnbutton.png",
-                                                        "testbuttonpush.png",
-                                                        this,
-                                                        menu_selector(GameStopLayer::StopClickCallback));
+    //¿”Ω√
+    
+    MenuItemImage *gRetryb = MenuItemImage::create("returnbutton.png",
+                                                   "testbuttonpush.png",
+                                                   CC_CALLBACK_1(GameStopLayer::StopClickCallback, this));
 
-    MenuItemImage *ghomeb = MenuItemImage::create(
-                                                        "homebutton.png",
-                                                        "testbuttonpush.png",
-                                                        this,
-                                                        menu_selector(GameStopLayer::StopClickCallback));
+    MenuItemImage *ghomeb = MenuItemImage::create("homebutton.png",
+                                                  "testbuttonpush.png",
+                                                  CC_CALLBACK_1(GameStopLayer::StopClickCallback, this));
+    
     gRetryb->setTag(1); ghomeb->setTag(2);
     
     gGameoverMenu = Menu::create(tempghomeb, NULL);
@@ -315,7 +310,7 @@ bool Playgame::init()
     
     addChild(gStopMenu,10);
     addChild(gGameoverMenu,10);
-    
+     */
     /////////////////////////////////////////////////////////////////
 
 		
@@ -334,14 +329,16 @@ bool Playgame::init()
     //초반구체 12개 생성
     for(int i=0; i<12; i++) FadeCircle();
 
-	setTouchEnabled(true);
-
-	schedule(schedule_selector(Playgame::GameLogic));
+    auto listener = EventListenerTouchAllAtOnce::create();
+    
+    listener->onTouchesBegan = CC_CALLBACK_2(Playgame::onTouchesBegan, this);
+    listener->onTouchesMoved = CC_CALLBACK_2(Playgame::onTouchesMoved, this);
+    listener->onTouchesEnded = CC_CALLBACK_2(Playgame::onTouchesEnded, this);
 
     return true;
 }
 
-void Playgame::menuClickCallback(Object* pSender)
+void Playgame::menuClickCallback(Ref* pSender)
 {
 	MenuItem *item = (MenuItem *)pSender;
 	if(gamestop==0){
@@ -361,9 +358,9 @@ void Playgame::menuClickCallback(Object* pSender)
 	}
 }
 
-void Playgame::touchesBegan(Set* touches, Event* event){
+void Playgame::touchesBegan(__Set* touches, Event* event){
 	if(gamestop==0){
-		SetIterator TouchPoint = touches->begin();
+		__SetIterator TouchPoint = touches->begin();
 		Touch* touch = (Touch*)(*TouchPoint);
 		Point location = touch->getLocation();
 		CPointF->setPosition(location.x,location.y);
@@ -371,7 +368,7 @@ void Playgame::touchesBegan(Set* touches, Event* event){
 		Max[0][1] = location.y;
 		//±◊∏±Ω√ º±¿Ã ≥™≈∏≥™µµ∑œ«‘
 		if(location.x>=0&&location.x<=size2.width&&location.y>=0&&location.y<=size2.height){
-			streak = MotionStreak::create(0.5, 3, 10, ccWHITE, "paddle.png" );
+            streak = MotionStreak::create(0.5, 3, 10, Color3B::WHITE, "paddle.png" );
 			addChild(streak,4);
 			streak->setPosition(location.x,location.y);
 			streakS=1;
@@ -381,10 +378,10 @@ void Playgame::touchesBegan(Set* touches, Event* event){
 	}
 }
 
-void Playgame::touchesMoved(Set* touches, Event* event)
+void Playgame::touchesMoved(__Set* touches, Event* event)
 {
 	if(gamestop==0){
-		SetIterator TouchPoint = touches->begin();
+		__SetIterator TouchPoint = touches->begin();
 		Touch* touch = (Touch*)(*TouchPoint);
 		Point location = touch->getLocation();
 		CPointE->setPosition(location.x, location.y);
@@ -401,7 +398,7 @@ void Playgame::touchesMoved(Set* touches, Event* event)
 	}
 }
 
-void Playgame::touchesEnded(Set* touches, cocos2d::Event* event)
+void Playgame::touchesEnded(__Set* touches, cocos2d::Event* event)
 {
 	float tempX,tempY;
 	int ccc=0;//원안에 들어온 구체의수를 담는변수
@@ -879,8 +876,8 @@ void Playgame::gameover(){ //게임오버처리
 	gamestop=1;
 	GameoverS=1;
 	timer=0;
-	CocosDenshion::SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
-	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("sound/SHORT_BGM_09.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("sound/SHORT_BGM_09.mp3");
     
 	backpopup = Sprite::create("Result.png");
 	backpopup->setPosition(size2.width/2, size2.height/2);
@@ -905,7 +902,7 @@ void GameStopLayer::onEnter(){
 	addChild(layer,5);
 }
 
-void GameStopLayer::StopClickCallback(Object* stopSender){
+void GameStopLayer::StopClickCallback(Ref* stopSender){
 	MenuItem* item      = (MenuItem *)stopSender;
     Director* director  = Director::getInstance();
 	Scene* gMain;
@@ -923,7 +920,7 @@ void GameStopLayer::StopClickCallback(Object* stopSender){
 			case 1:
 				stime = 3;
 				stimes = 1;
-				stimeN = LabelTTF::create("3", "맑은고딕", 40);
+				stimeN = Label::createWithTTF("3", "맑은고딕", 40);
 				stimeN->setPosition(size2.width/2,size2.height/2);
 				addChild(stimeN,10);
 				gStopMenu->setVisible(false);

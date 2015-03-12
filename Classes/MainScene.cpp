@@ -22,7 +22,7 @@ Sprite* pSprite;
 Sprite* tpSprite;
 Sprite* gHelpT;
 Size size;
-LabelTTF* helppoint;
+Label* helppoint;
 
 HelpLayer* hlayer;
 GameEndLayer* elayer;
@@ -42,7 +42,7 @@ Scene* MainScene::scene()
 
 bool MainScene::init()
 {
-	size = Director::sharedDirector()->getWinSize();
+	size = Director::getInstance()->getWinSize();
     
 	////////////////////////////////////////////////////////배경
     
@@ -102,9 +102,8 @@ bool MainScene::init()
 	addChild(pMenu2, 2);
 	addChild(pMenu3, 2);
     
-    FadeIn* fadeby = FadeIn::create(0.5);
-    pMenu->runAction(Sequence::create(DelayTime::create(1.0),FadeIn::create(1.0),NULL));
-    pMenu3->runAction(Sequence::create(DelayTime::create(1.0),FadeIn::create(1.0),NULL));
+    pMenu->runAction(Sequence::create(DelayTime::create(1.0),  FadeIn::create(1.0),NULL));
+    pMenu3->runAction(Sequence::create(DelayTime::create(1.0), FadeIn::create(1.0),NULL));
     
 	schedule(schedule_selector(MainScene::MainLogic));
 
@@ -116,10 +115,11 @@ void MainScene::onEnter(){
     for(int i=0; i<=39; i++) MainScene::FadeCircle(); //간지용 구체생성
 }
 
-void MainScene::menuClickCallback(Object* pSender)
+void MainScene::menuClickCallback(Ref* pSender)
 {
     Objectcircle temp;
-	char string[12] = {0};
+	//char string[12] = {0};
+    
 	MenuItem *item = (MenuItem *)pSender;
 	Scene *OptionS;
 	Scene *SelectS;
@@ -179,8 +179,9 @@ void MainScene::MainLogic(float dt){
 		}
 	}
     
-    Objectcircle tempfunc;
-    int loop_circlecount = tempfunc.GetCircleCount(HomeCircleList);
+    //Objectcircle tempfunc;
+    //int loop_circlecount = tempfunc.GetCircleCount(HomeCircleList);
+    
     Objectcircle::Circle* tempnode = HomeCircleList;
     if(tempnode!=NULL){
         while(true){
@@ -266,7 +267,7 @@ void HelpLayer::onEnter()
     addChild(gHelppopup,6);
     
 	sprintf(string, "%d / %d", helpnum, maxhelpnum);
-	helppoint = LabelTTF::create(string, "맑은 고딕", 25);
+	helppoint = Label::createWithTTF(string, "맑은 고딕", 25);
 	helppoint->setColor(Color3B(0,0,0));
 	helppoint->setPosition(size.width / 2, 110);
     char *paths;
@@ -279,7 +280,7 @@ void HelpLayer::onEnter()
 	hlayer->addChild(help_layer,5);
 }
 
-void HelpLayer::helpClickCallback(Object* hSender)
+void HelpLayer::helpClickCallback(Ref* hSender)
 {
 	
 	char string[12] = {0};
@@ -338,19 +339,19 @@ void GameEndLayer::onEnter()
     
 	Sprite* gExitpopup = Sprite::create("what.png");
 	gExitpopup->setPosition(size.width/2, size.height/2);
-	m_Sae3 = CocosDenshion::SimpleAudioEngine::sharedEngine();
+	m_Sae3 = CocosDenshion::SimpleAudioEngine::getInstance();
 	elayer->addChild(gExitpopup, 6);
 	elayer->addChild(layer, 5);
 }
 
-void GameEndLayer::EndClickCallback(Object* eSender)
+void GameEndLayer::EndClickCallback(Ref* eSender)
 {
 	m_Sae3->playEffect("sound/Click.wav");
 	MenuItem* item = (MenuItem*)eSender;
     
 	switch(item->getTag()){
 		case 1:
-			Director::sharedDirector()->end();
+			Director::getInstance()->end();
 			break;
 		case 2:
 			helpswitch=0;

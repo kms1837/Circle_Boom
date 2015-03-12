@@ -8,9 +8,9 @@ Objectcircle::Circle* mainCricleList = NULL;
 //CCLayer* HelpPopupLayer;
 //CCLayer* EndPopupLayer;
 
-const char* helpPopupImgName[4] = {"", "helpim1.png" , "helpim3.png","helpim9.png"};
+const char* helpPopupImgName[4] = {"", "help/helpim1.png" , "help/helpim3.png","help/helpim9.png"};
 
-LabelTTF* helppointText;
+Label* helppointText;
 Sprite* helpPopupImg;
 
 bool popupS = false;
@@ -32,67 +32,68 @@ bool GameMain::init(){
     size = Director::getInstance()->getWinSize();
     //CCLog("sound_volume : %f",Management::sound_volume);
     
-    Sprite* imgGameTitle =Sprite::create("title.png");
+    Sprite* imgGameTitle = Sprite::create("main/title.png");
 	imgGameTitle->setPosition(size.width/2, size.height/2+50);
 	this->addChild(imgGameTitle,1);
     
-    Sprite* mainBackgrount =Sprite::create("Pbackground8.png");
+    Sprite* mainBackgrount = Sprite::create("background/Pbackground8.png");
     mainBackgrount->setPosition(size.width/2, size.height/2);
     this->addChild(mainBackgrount,0);
     
-	MenuItemImage* helpb = MenuItemImage::create("helpbutton2.png",
-                                                 "helpbutton2.png",
+	MenuItemImage* helpb = MenuItemImage::create("main/helpbutton2.png",
+                                                 "main/helpbutton2.png",
                                                  CC_CALLBACK_1(GameMain::MainClickCallback, this));
     //도움말
     
     helpb->setTag(HELP);
-	Menu* helpMenu =Menu::create(helpb, NULL);
-    helpMenu->setPosition(35,125);
-	
+	Menu* helpMenu = Menu::create(helpb, nullptr);
+    helpMenu->setPosition(0, size.height/2 - 250);
     
-	MenuItemImage* settingb = MenuItemImage::create("settingbutton2.png",
-                                                    "settingbutton2.png",
+	MenuItemImage* settingb = MenuItemImage::create("main/settingbutton2.png",
+                                                    "main/settingbutton2.png",
                                                     CC_CALLBACK_1(GameMain::MainClickCallback, this));
     //옵션
-    
     settingb->setTag(SETTING);
-	Menu* settingMenu =Menu::create(settingb, NULL);
-    settingMenu->setPosition(size.width - 30,125);
-	
+	Menu* settingMenu = Menu::create(settingb, nullptr);
+    settingMenu->setPosition(size.width, size.height/2 - 250);
     
-    MenuItemImage* playb = MenuItemImage::create("playb3.png",
-                                                 "playb3.png",
+    log("height Size : %f", size.height);
+    
+    MenuItemImage* playb = MenuItemImage::create("main/playb3.png",
+                                                 "main/playb3.png",
                                                  CC_CALLBACK_1(GameMain::MainClickCallback, this));
     //게임시작
-    
-	/*MenuItemImage *exitb =MenuItemImage::create( //종료
+    /*
+	MenuItemImage *exitb =MenuItemImage::create( //종료
                                                      "exitb.png",
                                                      "exitb.png",
                                                      this,
-                                                     menu_selector(GameMain::MainClickCallback));*/
+                                                     CC_CALLBACK_1(GameMain::MainClickCallback));
+     */
+
+    playb->setTag(GAMESTART);
+    //exitb->setTag(EXIT);
     
-    playb->setTag(GAMESTART); //exitb->setTag(EXIT);
-    
-    Menu* mainMenu =Menu::create(playb, NULL);
-	mainMenu->setPosition(size.width/2, 105);
+    Menu* mainMenu = Menu::create(playb, nullptr);
+	mainMenu->setPosition(size.width/2, size.height/2 - 250);
 	//mainMenu->alignItemsVertically();
     
     addChild(helpMenu, 2);
 	addChild(settingMenu, 2);
 	addChild(mainMenu, 2);
     
-    helpMenu->setOpacity(0);
-    settingMenu->setOpacity(0);
-    mainMenu->setOpacity(0);
+    helpMenu    ->setOpacity(0);
+    settingMenu ->setOpacity(0);
+    mainMenu    ->setOpacity(0);
     
-    helpMenu->runAction(Sequence::create(DelayTime::create(1.0),FadeIn::create(1.0),NULL));
-    settingMenu->runAction(Sequence::create(DelayTime::create(1.0),FadeIn::create(1.0),NULL));
-    mainMenu->runAction(Sequence::create(DelayTime::create(1.0),FadeIn::create(1.0),NULL));
+    helpMenu    ->runAction(Sequence::create(DelayTime::create(1.0),FadeIn::create(1.0),NULL));
+    settingMenu ->runAction(Sequence::create(DelayTime::create(1.0),FadeIn::create(1.0),NULL));
+    mainMenu    ->runAction(Sequence::create(DelayTime::create(1.0),FadeIn::create(1.0),NULL));
     
     return true;
 }
 
-void GameMain::MainClickCallback(Object* pSender)
+void GameMain::MainClickCallback(Ref* pSender)
 {
     MenuItem* pMenuItem = (MenuItem *)pSender;
     Director* director = Director::getInstance();
@@ -126,25 +127,28 @@ void GameMain::HelpPopup()
         
         Layer* HelpPopupLayer = LayerColor::create(Color4B(0, 0, 0, 100));
         HelpPopupLayer->setTag(HELPPOPLAYERTAG);
-        Sprite* gHelppopup =Sprite::create("helpback.png");
-        gHelppopup->setPosition(size.width/2,size.height/2);
+        Sprite* gHelppopup = Sprite::create("main/helpback.png");
+        gHelppopup->setPosition(size.width/2, size.height/2);
         
-        MenuItemImage *helpb_Exit = MenuItemImage::create("Xbutton.png",
-                                                          "Xbuttonpush.png",
+        MenuItemImage *helpb_Exit = MenuItemImage::create("other/Xbutton.png",
+                                                          "other/Xbuttonpush.png",
                                                           CC_CALLBACK_1(GameMain::HelpClickCallback, this));
         //종료버튼
         
-        MenuItemImage *helpb_Next = MenuItemImage::create("sbutton.png",
-                                                          "Xbuttonpush.png",
+        MenuItemImage *helpb_Next = MenuItemImage::create("other/sbutton.png",
+                                                          "other/Xbuttonpush.png",
                                                           CC_CALLBACK_1(GameMain::HelpClickCallback, this));
         //다음
         
-        MenuItemImage *helpb_Prev = MenuItemImage::create("sbutton.png",
-                                                          "Xbuttonpush.png",
+        MenuItemImage *helpb_Prev = MenuItemImage::create("other/sbutton.png",
+                                                          "other/Xbuttonpush.png",
                                                           CC_CALLBACK_1(GameMain::HelpClickCallback, this));
         //이전
         
-        helpb_Exit->setTag(CANCEL); helpb_Next->setTag(HELPNEXT); helpb_Prev->setTag(HELPPREV);
+        helpb_Exit->setTag(CANCEL);
+        helpb_Next->setTag(HELPNEXT);
+        helpb_Prev->setTag(HELPPREV);
+        
         helpb_Next->setRotation(180);
         helpb_Next->setPosition(70,0);
         helpb_Prev->setPosition(-70,0);
@@ -156,7 +160,7 @@ void GameMain::HelpPopup()
         HelpExitMenu->setPosition(size.width/2+180, size.height/2+230);
         
         sprintf(string, "%d / %d", helpnum, maxhelpnum);
-        helppointText =LabelTTF::create(string, "맑은 고딕", 25);
+        helppointText = Label::createWithTTF(string, "font/NanumGothic.ttc", 25);
         helppointText->setColor(Color3B(0,0,0));
         helppointText->setPosition(size.width / 2, 110);
         
@@ -172,7 +176,7 @@ void GameMain::HelpPopup()
     }
 }
 
-void GameMain::HelpClickCallback(Object* pSender)
+void GameMain::HelpClickCallback(Ref* pSender)
 {
     MenuItem* pMenuItem = (MenuItem *)pSender;
     
@@ -237,7 +241,7 @@ void GameMain::EndPopup()
     }
 }
 
-void GameMain::EndClickCallback(Object* pSender)
+void GameMain::EndClickCallback(Ref* pSender)
 {
     MenuItem* pMenuItem = (MenuItem *)pSender;
     Director *director = Director::getInstance();

@@ -29,8 +29,8 @@ public:
     static cocos2d::Scene* scene();
 
     //void touchNamo();
-    void StopMenuCallback(cocos2d::Object* pSender);
-    void OverMenuCallback(cocos2d::Object* pSender);
+    void StopMenuCallback(cocos2d::Ref* pSender);
+    void OverMenuCallback(cocos2d::Ref* pSender);
 
     CREATE_FUNC(InGameScene);
     
@@ -38,9 +38,9 @@ private:
     
     //////////////////////////////
     //Touch Event
-    virtual void touchesBegan(cocos2d::Set* touches, cocos2d::Event* event);
-    virtual void touchesMoved(cocos2d::Set* touches, cocos2d::Event* event);
-    virtual void touchesEnded(cocos2d::Set* touches, cocos2d::Event* event);
+    virtual void touchesBegan(cocos2d::__Set* touches, cocos2d::Event* event);
+    virtual void touchesMoved(cocos2d::__Set* touches, cocos2d::Event* event);
+    virtual void touchesEnded(cocos2d::__Set* touches, cocos2d::Event* event);
     
     //////////////////////////////
     //Schedule & Function
@@ -95,22 +95,22 @@ protected:
     
     //////////////////////////////
     //game setting
-    int gameOverMaxCircle   = cocos2d::UserDefault::sharedUserDefault()->getIntegerForKey("gameOverCircle");        //게임오버조건
-    int setcombotimer       = cocos2d::UserDefault::sharedUserDefault()->getIntegerForKey("gameComboTimer") * 60;   //콤보시간
+    int gameOverMaxCircle   = cocos2d::UserDefault::getInstance()->getIntegerForKey("gameOverCircle");        //게임오버조건
+    int setcombotimer       = cocos2d::UserDefault::getInstance()->getIntegerForKey("gameComboTimer") * 60;   //콤보시간
     int setfevernum         = 5;//피버조건
     
     //////////////////////////////
     //other
     unsigned int testt[100][2];
     int testc = 0;
-    int gameCountNum; //게임카운터
+    int gameCountNum;   //게임카운터
     
-    int combotimer = 0;//콤보 타이머
-    int combonum = 0; //게임콤보
+    int combotimer = 0; //콤보 타이머
+    int combonum = 0;   //게임콤보
     
-    int gamescore = 0; //게임스코어
-    int maxcombo = 0; //최대콤보
-    int playtime = 0; //플레이타임
+    int gamescore = 0;  //게임스코어
+    int maxcombo = 0;   //최대콤보
+    int playtime = 0;   //플레이타임
     
     int fevertimernum = 0;
     
@@ -120,8 +120,8 @@ protected:
     //////////////////////////////
     //Timer
     //float createTimer = 3.0f; //구체등장 시간 설정
-    float createTimer   = cocos2d::UserDefault::sharedUserDefault()->getFloatForKey("createSpeed");
-    int setDistance     = cocos2d::UserDefault::sharedUserDefault()->getIntegerForKey("distance");
+    float createTimer   = cocos2d::UserDefault::getInstance()->getFloatForKey("createSpeed");
+    int setDistance     = cocos2d::UserDefault::getInstance()->getIntegerForKey("distance");
    
 };
 

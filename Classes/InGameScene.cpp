@@ -10,8 +10,8 @@ using namespace std;
 //                  - 구체는 일정시간이 되면 3개씩 등장한다.(default:3s)
 //                  - 구체가 모두 사라지면 보너스점수를 주고 9개를 생성한다.
 //                  - 구체가 게임화면 이상,이하로 넘어가면 이동위치를 반전시킨다.
-//                  - 귀찮귀찮 ㅎㅎㅎㅎㅎ
-//                  - 졸리다ㅠㅠ
+//                  -
+//                  -
 //
 //=====================================================================================
 
@@ -19,8 +19,8 @@ using namespace std;
 //http://visibone.com/inpoly/
 //http://kldp.org/node/65088
 
-LabelTTF* circleCount = NULL;
-LabelTTF* gameCountLabel = NULL;
+Label* circleCount    = NULL;
+Label* gameCountLabel = NULL;
 
 std::string settingCircle = "tempcircle.png";
 
@@ -28,7 +28,7 @@ std::string settingCircle = "tempcircle.png";
 
 Scene* InGameScene::scene()
 {
-    Scene* gameScene = Scene::create();
+    Scene* gameScene        = Scene::create();
     InGameScene* Game_layer = InGameScene::create();
     
 	gameScene->addChild(Game_layer);
@@ -37,11 +37,10 @@ Scene* InGameScene::scene()
 
 bool InGameScene::init()
 {
+    size = Director::getInstance()->getWinSize();
     
-    size = Director::sharedDirector()->getVisibleSize();
-    
-    Sprite* backGround = Sprite::create("Pbackground7_2.png");
-    backGround->setPosition(size.width/2,size.height/2);
+    Sprite* backGround = Sprite::create("background/Pbackground7_2.png");
+    backGround->setPosition(size.width/2, size.height/2);
     addChild(backGround);
     
     MenuItemImage* stopButton = MenuItemImage::create("gamestopb.png",
@@ -50,16 +49,16 @@ bool InGameScene::init()
     
     Menu *stopmenu = Menu::create(stopButton, nullptr);
     
-    stopmenu->setPosition(50,size.height-40);
+    stopmenu->setPosition(50, size.height-40);
     addChild(stopmenu);
     //stopMenu
     
-    circleCount = LabelTTF::create("0", "맑은 고딕", 60);
+    circleCount = Label::createWithTTF("0", "font/NanumGothic.ttc", 60);
     circleCount->setPosition(size.width-40, 40);
     circleCount->setColor(Color3B(255,255,255));
-    addChild(circleCount,2);
+    addChild(circleCount, 2);
     
-    LabelTTF* comboLabel = LabelTTF::create("0", "맑은 고딕", 80);
+    Label* comboLabel = Label::createWithTTF("0", "font/NanumGothic.ttc", 80);
     comboLabel->setPosition(size.width/2, size.height/2);
     comboLabel->setTag(COMBOLABELTAG);
     comboLabel->setColor(Color3B(255,255,255));
@@ -67,14 +66,20 @@ bool InGameScene::init()
     addChild(comboLabel, 5);
     //Combo Label
     
-    LabelTTF* scoreLabel = LabelTTF::create("0", "맑은 고딕", 50, CCSizeMake(400, 100), kCCTextAlignmentRight);
+    Label* scoreLabel = Label::createWithTTF("0", "font/NanumGothic.ttc", 50, Size(400, 100), TextHAlignment::RIGHT);
     scoreLabel->setPosition(size.width-300, size.height-80);
     scoreLabel->setColor(Color3B(255,255,255));
     scoreLabel->setTag(SCORELABELTAG);
     addChild(scoreLabel, 5);
     //Score Label
     
-    setTouchEnabled(true);
+    auto listener = EventListenerTouchAllAtOnce::create();
+    
+    listener->onTouchesBegan = CC_CALLBACK_2(InGameScene::onTouchesBegan, this);
+    listener->onTouchesMoved = CC_CALLBACK_2(InGameScene::onTouchesMoved, this);
+    listener->onTouchesEnded = CC_CALLBACK_2(InGameScene::onTouchesEnded, this);
+    
+    gameOverMaxCircle = 50;
     
     return true;
 }
@@ -84,9 +89,9 @@ void InGameScene::onEnter()
     Layer::onEnter();
     Objectcircle temp;
     
-    gamestopS=1; //카운트를 위해 처음에 멈추게 설정
-    gamedengerS=0;
-    list=NULL;
+    gamestopS    = 1; //카운트를 위해 처음에 멈추게 설정
+    gamedengerS  = 0;
+    list         = NULL;
     gameCountNum = 3;
     char tempstring[20]={0,};
     
@@ -219,7 +224,7 @@ void InGameScene::GameCount(float dt)
 void InGameScene::ComboLabelMove(float dt)
 {
     char tempstring[100000]={0,};
-    LabelTTF* temptxt = (LabelTTF*)getChildByTag(SCORELABELTAG);
+    Label* temptxt = (Label*)getChildByTag(SCORELABELTAG);
     if(gamestopS==0){
         float tempX, tempY;
         Objectcircle temp;
@@ -312,9 +317,9 @@ void InGameScene::allFadeRemoveFeverCircle(float dt)
 
 #pragma mark- 터치이벤트
 
-void InGameScene::touchesBegan(cocos2d::Set *touches, cocos2d::Event *event)
+void InGameScene::touchesBegan(cocos2d::__Set *touches, cocos2d::Event *event)
 {
-    SetIterator TouchPoint = touches->begin();
+    __SetIterator TouchPoint = touches->begin();
     Touch* touch = (Touch*)(*TouchPoint);
     Point location = touch->getLocation();
     
@@ -324,7 +329,7 @@ void InGameScene::touchesBegan(cocos2d::Set *touches, cocos2d::Event *event)
         testt[0][0] = location.x;
         testt[0][1] = location.y;
 
-        streak = MotionStreak::create(0.5, 3, 10, ccWHITE, "paddle.png" );
+        streak = MotionStreak::create(0.5, 3, 10, Color3B::WHITE, "paddle.png" );
         streak->setPosition(location.x,location.y);
         addChild(streak,4);
         
@@ -364,10 +369,10 @@ void InGameScene::touchesBegan(cocos2d::Set *touches, cocos2d::Event *event)
     }
 }//터치시
 
-void InGameScene::touchesMoved(cocos2d::Set *touches, cocos2d::Event *event)
+void InGameScene::touchesMoved(__Set *touches, Event *event)
 {
     if(gamestopS==0&&feverswitch==0){
-        SetIterator TouchPoint = touches->begin();
+        __SetIterator TouchPoint = touches->begin();
         Touch* touch = (Touch*)(*TouchPoint);
         Point location = touch->getLocation();
         
@@ -395,9 +400,9 @@ void InGameScene::touchesMoved(cocos2d::Set *touches, cocos2d::Event *event)
 //
 //=====================================================================================
 
-void InGameScene::touchesEnded(cocos2d::Set* touches, cocos2d::Event* event)
+void InGameScene::touchesEnded(cocos2d::__Set* touches, cocos2d::Event* event)
 {
-    SetIterator TouchPoint = touches->begin();
+    __SetIterator TouchPoint = touches->begin();
     Touch* touch = (Touch*)(*TouchPoint);
     Point location = touch->getLocation();
     
@@ -413,7 +418,7 @@ void InGameScene::touchesEnded(cocos2d::Set* touches, cocos2d::Event* event)
         testt[testc][0] = location.x;
         testt[testc][1] = location.y;
         
-        float jum = sqrt(pow(testt[testc][0]-testt[0][0], 2) + pow(testt[testc][1]-testt[0][1], 2));
+        //float jum = sqrt(pow(testt[testc][0]-testt[0][0], 2) + pow(testt[testc][1]-testt[0][1], 2));
         
         //log("%f",jum);
         if(true){ //jum <= setDistance
@@ -535,7 +540,7 @@ void InGameScene::GameStop() //GameStop 레이어 생성
     }
 }
 
-void InGameScene::StopMenuCallback(Object* pSender)
+void InGameScene::StopMenuCallback(Ref* pSender)
 {
     Objectcircle temp;
     MenuItem* itemTag = (MenuItem *)pSender;
@@ -573,22 +578,22 @@ void InGameScene::GameOver()
     overTextImg->setPosition(size.width/2, size.height/2);
     overTextImg->setOpacity(0);
     
-    LabelTTF* endscorelabel = LabelTTF::create("0", "맑은 고딕", 30, CCSizeMake(400, 60),kCCTextAlignmentRight);
+    Label* endscorelabel = Label::createWithTTF("0", "font/NanumGothic.ttc", 30, Size(400, 60), TextHAlignment::RIGHT);
     endscorelabel->setPosition(size.width/2+100, size.height/2+80);
-    endscorelabel->setColor(ccBLACK);
+    endscorelabel->setColor(Color3B::BLACK);
     endscorelabel->setOpacity(0);
     sprintf(tempstring, "%d",gamescore);
     endscorelabel->setString(tempstring);
     log("score:%d\nmaxcombo:%d", gamescore, maxcombo);
     
-    LabelTTF* endplaytimelabel = LabelTTF::create("0", "맑은 고딕", 30, CCSizeMake(400, 60),kCCTextAlignmentRight);
-    endplaytimelabel->setPosition(ccp(size.width/2+100, size.height/2));
-    endplaytimelabel->setColor(ccBLACK);
+    Label* endplaytimelabel = Label::createWithTTF("0", "font/NanumGothic.ttc", 30, Size(400, 60), TextHAlignment::RIGHT);
+    endplaytimelabel->setPosition(size.width/2+100, size.height/2);
+    endplaytimelabel->setColor(Color3B::BLACK);
     endplaytimelabel->setOpacity(0);
     
-    LabelTTF* endmaxcombolabel = LabelTTF::create("0", "맑은 고딕", 30, CCSizeMake(400, 60),kCCTextAlignmentRight);
+    Label* endmaxcombolabel = Label::createWithTTF("0", "font/NanumGothic.ttc", 30, Size(400, 60), TextHAlignment::RIGHT);
     endmaxcombolabel->setPosition(size.width/2+100, size.height/2-80);
-    endmaxcombolabel->setColor(ccBLACK);
+    endmaxcombolabel->setColor(Color3B::BLACK);
     sprintf(tempstring, "%d",maxcombo);
     endmaxcombolabel->setString(tempstring);
     
@@ -641,7 +646,7 @@ void InGameScene::GameOver()
     
 }
 
-void InGameScene::OverMenuCallback(Object* pSender)
+void InGameScene::OverMenuCallback(Ref* pSender)
 {
     //Objectcircle temp;
     MenuItem* itemTag = (MenuItem *)pSender;
@@ -731,7 +736,7 @@ void InGameScene::EffectCreate(int x, int y){
 void InGameScene::GameCountStart()
 {
     
-    gameCountLabel = LabelTTF::create("3", "맑은 고딕", 60);
+    gameCountLabel = Label::createWithTTF("3", "font/NanumGothic.ttc", 60);
     gameCountLabel->setPosition(size.width/2, size.height/2);
     gameCountLabel->setColor(Color3B(255,255,255));
     addChild(gameCountLabel,2);
@@ -745,7 +750,7 @@ void InGameScene::ComboLabelCreate(int x, int y)
     Objectcircle temp;
     Objectcircle::ComboLabelNode* tempNode;
     tempNode = temp.Createcircle();
-    tempNode->comboLable = LabelTTF::create("+100", "맑은 고딕", 40);
+    tempNode->comboLable = Label::createWithTTF("+100", "font/NanumGothic.ttc", 40);
     tempNode->comboLable->setPosition(x, y);
     tempNode->comboLable->setColor(Color3B(255,255,255));
     addChild(tempNode->comboLable);
@@ -762,7 +767,7 @@ void InGameScene::ComboCenterLabelPlay()
         combotimer = setcombotimer;
     }else{
         combotimer = setcombotimer;
-        LabelTTF* templabel = (LabelTTF*)getChildByTag(COMBOLABELTAG);
+        Label* templabel = (Label*)getChildByTag(COMBOLABELTAG);
         sprintf(tempstring, " %dcombo!",combonum);
         templabel->setString(tempstring);
         templabel->runAction(Sequence::create(FadeIn::create(0.5),

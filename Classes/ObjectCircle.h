@@ -23,7 +23,7 @@ public:
 	};
     
     struct ComboLabelNode{
-        cocos2d::LabelTTF* comboLable;
+        cocos2d::Label* comboLable;
         ComboLabelNode* next;
 		ComboLabelNode* prev;
         

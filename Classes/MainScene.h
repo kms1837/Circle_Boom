@@ -12,7 +12,7 @@ public:
     virtual bool init();
     virtual void onEnter();
     static cocos2d::Scene* scene();
-    void menuClickCallback(cocos2d::Object* pSender);
+    void menuClickCallback(cocos2d::Ref* pSender);
     void mainFadeCircle(int fadetemp);
     void FadeCircle();
     void HellpPopUp();
@@ -33,7 +33,7 @@ class HelpLayer: public cocos2d::Layer
 	public:
 		virtual void onEnter();
 		CocosDenshion::SimpleAudioEngine *m_Sae2;
-		void helpClickCallback(cocos2d::Object* hSender);
+		void helpClickCallback(cocos2d::Ref* hSender);
 		CREATE_FUNC(HelpLayer);
 
 };
@@ -43,7 +43,7 @@ class GameEndLayer: public cocos2d::Layer
 	public:
 		virtual void onEnter();
 		CocosDenshion::SimpleAudioEngine *m_Sae3;
-		void EndClickCallback(cocos2d::Object* eSender);
+		void EndClickCallback(cocos2d::Ref* eSender);
 		CREATE_FUNC(GameEndLayer);
 };
 

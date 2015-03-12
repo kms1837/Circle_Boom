@@ -186,11 +186,11 @@ void Objectcircle::FadeCircle(Circle** list, Layer* childScene, std::string file
     
     FadeIn *FadeBy = FadeIn::create(0.5);
 	temp = Createcircle(fileName); // A
-    temp->streak = CCMotionStreak::create(1, 3, 70, ccGREEN, "paddle.png");//페이드속도, 생성간격 , 너비, 색, 텍스쳐
+    temp->streak = CCMotionStreak::create(1, 3, 70, Color3B::GREEN, "paddle.png");//페이드속도, 생성간격 , 너비, 색, 텍스쳐
     
     //temp->moveSpeed = moveSpeed[rand()%2+1];
     //temp->moveSpeed = rand()%2+1;
-    temp->moveSpeed = CCUserDefault::sharedUserDefault()->getIntegerForKey("moveSpeed");
+    temp->moveSpeed = UserDefault::getInstance()->getIntegerForKey("moveSpeed");
     
 	Spr_temp = temp->Mcir; //B
 	Spr_temp->setOpacity(0);
@@ -207,6 +207,6 @@ void Objectcircle::FadeCircle(Circle** list, Layer* childScene, std::string file
 }//객체생성 및 페이드
 
 void Objectcircle::FlipCircle(Sprite* flipObject ,int x){
-    if(x==1)flipObject->setFlipX(true);
-    else    flipObject->setFlipX(false);
+    if(x==1)flipObject->setFlippedX(true);
+    else    flipObject->setFlippedX(false);
 }

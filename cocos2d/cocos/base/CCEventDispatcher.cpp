@@ -1,5 +1,5 @@
 /****************************************************************************
- Copyright (c) 2013-2014 Chukong Technologies Inc.
+ Copyright (c) 2013-2017 Chukong Technologies Inc.
 
  http://www.cocos2d-x.org
 
@@ -22,8 +22,8 @@
  THE SOFTWARE.
  ****************************************************************************/
 #include "base/CCEventDispatcher.h"
-#include "base/CCEvent.h"
-#include "base/CCEventTouch.h"
+#include <algorithm>
+
 #include "base/CCEventCustom.h"
 #include "base/CCEventListenerTouch.h"
 #include "base/CCEventListenerAcceleration.h"
@@ -31,15 +31,13 @@
 #include "base/CCEventListenerKeyboard.h"
 #include "base/CCEventListenerCustom.h"
 #include "base/CCEventListenerFocus.h"
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 #include "base/CCEventListenerController.h"
 #endif
 #include "2d/CCScene.h"
 #include "base/CCDirector.h"
 #include "base/CCEventType.h"
-
-#include <algorithm>
-
+#include "2d/CCCamera.h"
 
 #define DUMP_LISTENER_ITEM_PRIORITY_INFO 0
 
@@ -96,7 +94,7 @@ static EventListener::ListenerID __getListenerID(Event* event)
             // return UNKNOWN instead.
             CCASSERT(false, "Don't call this method if the event is for touch.");
             break;
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
         case Event::Type::GAME_CONTROLLER:
             ret = EventListenerController::LISTENER_ID;
             break;
@@ -155,7 +153,7 @@ void EventDispatcher::EventListenerVector::push_back(EventListener* listener)
     {
         if (_sceneGraphListeners == nullptr)
         {
-            _sceneGraphListeners = new std::vector<EventListener*>();
+            _sceneGraphListeners = new (std::nothrow) std::vector<EventListener*>();
             _sceneGraphListeners->reserve(100);
         }
         
@@ -206,6 +204,7 @@ EventDispatcher::EventDispatcher()
 , _nodePriorityIndex(0)
 {
     _toAddedListeners.reserve(50);
+    _toRemovedListeners.reserve(50);
     
     // fixed #4129: Mark the following listener IDs for internal use.
     // Therefore, internal listeners would not be cleaned when removeAllEventListeners is invoked.
@@ -223,7 +222,9 @@ EventDispatcher::~EventDispatcher()
 }
 
 void EventDispatcher::visitTarget(Node* node, bool isRootNode)
-{    
+{
+    node->sortAllChildren();
+    
     int i = 0;
     auto& children = node->getChildren();
     
@@ -273,7 +274,7 @@ void EventDispatcher::visitTarget(Node* node, bool isRootNode)
             globalZOrders.push_back(e.first);
         }
         
-        std::sort(globalZOrders.begin(), globalZOrders.end(), [](const float a, const float b){
+        std::stable_sort(globalZOrders.begin(), globalZOrders.end(), [](const float a, const float b){
             return a < b;
         });
         
@@ -382,7 +383,7 @@ void EventDispatcher::removeEventListenersForTarget(Node* target, bool recursive
         {
             listener->setAssociatedNode(nullptr);   // Ensure no dangling ptr to the target node.
             listener->setRegistered(false);
-            listener->release();
+            releaseListener(listener);
             iter = _toAddedListeners.erase(iter);
         }
         else
@@ -411,8 +412,8 @@ void EventDispatcher::associateNodeAndEventListener(Node* node, EventListener* l
     }
     else
     {
-        listeners = new std::vector<EventListener*>();
-        _nodeListenersMap.insert(std::make_pair(node, listeners));
+        listeners = new (std::nothrow) std::vector<EventListener*>();
+        _nodeListenersMap.emplace(node, listeners);
     }
     
     listeners->push_back(listener);
@@ -449,7 +450,13 @@ void EventDispatcher::addEventListener(EventListener* listener)
     {
         _toAddedListeners.push_back(listener);
     }
-
+#if CC_ENABLE_GC_FOR_NATIVE_OBJECTS
+    auto sEngine = ScriptEngineManager::getInstance()->getScriptEngine();
+    if (sEngine)
+    {
+        sEngine->retainScriptObject(this, listener);
+    }
+#endif // CC_ENABLE_GC_FOR_NATIVE_OBJECTS
     listener->retain();
 }
 
@@ -461,8 +468,8 @@ void EventDispatcher::forceAddEventListener(EventListener* listener)
     if (itr == _listenerMap.end())
     {
         
-        listeners = new EventListenerVector();
-        _listenerMap.insert(std::make_pair(listenerID, listeners));
+        listeners = new (std::nothrow) EventListenerVector();
+        _listenerMap.emplace(listenerID, listeners);
     }
     else
     {
@@ -480,9 +487,9 @@ void EventDispatcher::forceAddEventListener(EventListener* listener)
         
         associateNodeAndEventListener(node, listener);
         
-        if (node->isRunning())
+        if (!node->isRunning())
         {
-            resumeEventListenersForTarget(node);
+            listener->setPaused(true);
         }
     }
     else
@@ -597,6 +604,10 @@ void EventDispatcher::removeEventListener(EventListener* listener)
 {
     if (listener == nullptr)
         return;
+    
+    // just return if listener is in _toRemovedListeners to avoid remove listeners more than once
+    if (std::find(_toRemovedListeners.begin(), _toRemovedListeners.end(), listener) != _toRemovedListeners.end())
+        return;
 
     bool isFound = false;
     
@@ -619,8 +630,12 @@ void EventDispatcher::removeEventListener(EventListener* listener)
                 
                 if (_inDispatch == 0)
                 {
-                    listeners->erase(iter);
-                    CC_SAFE_RELEASE(l);
+                    iter = listeners->erase(iter);
+                    releaseListener(l);
+                }
+                else
+                {
+                    _toRemovedListeners.push_back(l);
                 }
                 
                 isFound = true;
@@ -680,7 +695,7 @@ void EventDispatcher::removeEventListener(EventListener* listener)
 
     if (isFound)
     {
-        CC_SAFE_RELEASE(listener);
+        releaseListener(listener);
     }
     else
     {
@@ -689,7 +704,7 @@ void EventDispatcher::removeEventListener(EventListener* listener)
             if (*iter == listener)
             {
                 listener->setRegistered(false);
-                listener->release();
+                releaseListener(listener);
                 _toAddedListeners.erase(iter);
                 break;
             }
@@ -702,9 +717,9 @@ void EventDispatcher::setPriority(EventListener* listener, int fixedPriority)
     if (listener == nullptr)
         return;
     
-    for (auto iter = _listenerMap.begin(); iter != _listenerMap.end(); ++iter)
+    for (auto& iter : _listenerMap)
     {
-        auto fixedPriorityListeners = iter->second->getFixedPriorityListeners();
+        auto fixedPriorityListeners = iter.second->getFixedPriorityListeners();
         if (fixedPriorityListeners)
         {
             auto found = std::find(fixedPriorityListeners->begin(), fixedPriorityListeners->end(), listener);
@@ -764,7 +779,104 @@ void EventDispatcher::dispatchEventToListeners(EventListenerVector* listeners, c
             }
         }
     }
+    
+    if (fixedPriorityListeners)
+    {
+        if (!shouldStopPropagation)
+        {
+            // priority > 0
+            ssize_t size = fixedPriorityListeners->size();
+            for (; i < size; ++i)
+            {
+                auto l = fixedPriorityListeners->at(i);
+                
+                if (l->isEnabled() && !l->isPaused() && l->isRegistered() && onEvent(l))
+                {
+                    shouldStopPropagation = true;
+                    break;
+                }
+            }
+        }
+    }
+}
 
+void EventDispatcher::dispatchTouchEventToListeners(EventListenerVector* listeners, const std::function<bool(EventListener*)>& onEvent)
+{
+    bool shouldStopPropagation = false;
+    auto fixedPriorityListeners = listeners->getFixedPriorityListeners();
+    auto sceneGraphPriorityListeners = listeners->getSceneGraphPriorityListeners();
+    
+    ssize_t i = 0;
+    // priority < 0
+    if (fixedPriorityListeners)
+    {
+        CCASSERT(listeners->getGt0Index() <= static_cast<ssize_t>(fixedPriorityListeners->size()), "Out of range exception!");
+        
+        if (!fixedPriorityListeners->empty())
+        {
+            for (; i < listeners->getGt0Index(); ++i)
+            {
+                auto l = fixedPriorityListeners->at(i);
+                if (l->isEnabled() && !l->isPaused() && l->isRegistered() && onEvent(l))
+                {
+                    shouldStopPropagation = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    auto scene = Director::getInstance()->getRunningScene();
+    if (scene && sceneGraphPriorityListeners)
+    {
+        if (!shouldStopPropagation)
+        {
+            // priority == 0, scene graph priority
+            
+            // first, get all enabled, unPaused and registered listeners
+            std::vector<EventListener*> sceneListeners;
+            for (auto& l : *sceneGraphPriorityListeners)
+            {
+                if (l->isEnabled() && !l->isPaused() && l->isRegistered())
+                {
+                    sceneListeners.push_back(l);
+                }
+            }
+            // second, for all camera call all listeners
+            // get a copy of cameras, prevent it's been modified in listener callback
+            // if camera's depth is greater, process it earlier
+            auto cameras = scene->getCameras();
+            for (auto rit = cameras.rbegin(), ritRend = cameras.rend(); rit != ritRend; ++rit)
+            {
+                Camera* camera = *rit;
+                if (camera->isVisible() == false)
+                {
+                    continue;
+                }
+                
+                Camera::_visitingCamera = camera;
+                auto cameraFlag = (unsigned short)camera->getCameraFlag();
+                for (auto& l : sceneListeners)
+                {
+                    if (nullptr == l->getAssociatedNode() || 0 == (l->getAssociatedNode()->getCameraMask() & cameraFlag))
+                    {
+                        continue;
+                    }
+                    if (onEvent(l))
+                    {
+                        shouldStopPropagation = true;
+                        break;
+                    }
+                }
+                if (shouldStopPropagation)
+                {
+                    break;
+                }
+            }
+            Camera::_visitingCamera = nullptr;
+        }
+    }
+    
     if (fixedPriorityListeners)
     {
         if (!shouldStopPropagation)
@@ -805,6 +917,10 @@ void EventDispatcher::dispatchEvent(Event* event)
     
     sortEventListeners(listenerID);
     
+    auto pfnDispatchEventToListeners = &EventDispatcher::dispatchEventToListeners;
+    if (event->getType() == Event::Type::MOUSE) {
+        pfnDispatchEventToListeners = &EventDispatcher::dispatchTouchEventToListeners;
+    }
     auto iter = _listenerMap.find(listenerID);
     if (iter != _listenerMap.end())
     {
@@ -816,7 +932,7 @@ void EventDispatcher::dispatchEvent(Event* event)
             return event->isStopped();
         };
         
-        dispatchEventToListeners(listeners, onEvent);
+        (this->*pfnDispatchEventToListeners)(listeners, onEvent);
     }
     
     updateListeners(event);
@@ -829,6 +945,10 @@ void EventDispatcher::dispatchCustomEvent(const std::string &eventName, void *op
     dispatchEvent(&ev);
 }
 
+bool EventDispatcher::hasEventListener(const EventListener::ListenerID& listenerID) const
+{
+    return getListeners(listenerID) != nullptr;
+}
 
 void EventDispatcher::dispatchTouchEvent(EventTouch* event)
 {
@@ -854,9 +974,8 @@ void EventDispatcher::dispatchTouchEvent(EventTouch* event)
     if (oneByOneListeners)
     {
         auto mutableTouchesIter = mutableTouches.begin();
-        auto touchesIter = originalTouches.begin();
         
-        for (; touchesIter != originalTouches.end(); ++touchesIter)
+        for (auto& touches : originalTouches)
         {
             bool isSwallowed = false;
 
@@ -878,15 +997,15 @@ void EventDispatcher::dispatchTouchEvent(EventTouch* event)
                 {
                     if (listener->onTouchBegan)
                     {
-                        isClaimed = listener->onTouchBegan(*touchesIter, event);
+                        isClaimed = listener->onTouchBegan(touches, event);
                         if (isClaimed && listener->_isRegistered)
                         {
-                            listener->_claimedTouches.push_back(*touchesIter);
+                            listener->_claimedTouches.push_back(touches);
                         }
                     }
                 }
                 else if (listener->_claimedTouches.size() > 0
-                         && ((removedIter = std::find(listener->_claimedTouches.begin(), listener->_claimedTouches.end(), *touchesIter)) != listener->_claimedTouches.end()))
+                         && ((removedIter = std::find(listener->_claimedTouches.begin(), listener->_claimedTouches.end(), touches)) != listener->_claimedTouches.end()))
                 {
                     isClaimed = true;
                     
@@ -895,13 +1014,13 @@ void EventDispatcher::dispatchTouchEvent(EventTouch* event)
                         case EventTouch::EventCode::MOVED:
                             if (listener->onTouchMoved)
                             {
-                                listener->onTouchMoved(*touchesIter, event);
+                                listener->onTouchMoved(touches, event);
                             }
                             break;
                         case EventTouch::EventCode::ENDED:
                             if (listener->onTouchEnded)
                             {
-                                listener->onTouchEnded(*touchesIter, event);
+                                listener->onTouchEnded(touches, event);
                             }
                             if (listener->_isRegistered)
                             {
@@ -911,7 +1030,7 @@ void EventDispatcher::dispatchTouchEvent(EventTouch* event)
                         case EventTouch::EventCode::CANCELLED:
                             if (listener->onTouchCancelled)
                             {
-                                listener->onTouchCancelled(*touchesIter, event);
+                                listener->onTouchCancelled(touches, event);
                             }
                             if (listener->_isRegistered)
                             {
@@ -931,7 +1050,8 @@ void EventDispatcher::dispatchTouchEvent(EventTouch* event)
                     return true;
                 }
                 
-                CCASSERT((*touchesIter)->getID() == (*mutableTouchesIter)->getID(), "");
+                CCASSERT(touches->getID() == (*mutableTouchesIter)->getID(),
+                         "touches ID should be equal to mutableTouchesIter's ID.");
                 
                 if (isClaimed && listener->_isRegistered && listener->_needSwallow)
                 {
@@ -947,7 +1067,7 @@ void EventDispatcher::dispatchTouchEvent(EventTouch* event)
             };
             
             //
-            dispatchEventToListeners(oneByOneListeners, onTouchEvent);
+            dispatchTouchEventToListeners(oneByOneListeners, onTouchEvent);
             if (event->isStopped())
             {
                 return;
@@ -1013,7 +1133,7 @@ void EventDispatcher::dispatchTouchEvent(EventTouch* event)
             return false;
         };
         
-        dispatchEventToListeners(allAtOnceListeners, onTouchesEvent);
+        dispatchTouchEventToListeners(allAtOnceListeners, onTouchesEvent);
         if (event->isStopped())
         {
             return;
@@ -1026,7 +1146,10 @@ void EventDispatcher::dispatchTouchEvent(EventTouch* event)
 void EventDispatcher::updateListeners(Event* event)
 {
     CCASSERT(_inDispatch > 0, "If program goes here, there should be event in dispatch.");
-    
+
+    if (_inDispatch > 1)
+        return;
+
     auto onUpdateListeners = [this](const EventListener::ListenerID& listenerID)
     {
         auto listenersIter = _listenerMap.find(listenerID);
@@ -1046,7 +1169,11 @@ void EventDispatcher::updateListeners(Event* event)
                 if (!l->isRegistered())
                 {
                     iter = sceneGraphPriorityListeners->erase(iter);
-                    l->release();
+                    // if item in toRemove list, remove it from the list
+                    auto matchIter = std::find(_toRemovedListeners.begin(), _toRemovedListeners.end(), l);
+                    if (matchIter != _toRemovedListeners.end())
+                        _toRemovedListeners.erase(matchIter);
+                    releaseListener(l);
                 }
                 else
                 {
@@ -1063,7 +1190,11 @@ void EventDispatcher::updateListeners(Event* event)
                 if (!l->isRegistered())
                 {
                     iter = fixedPriorityListeners->erase(iter);
-                    l->release();
+                    // if item in toRemove list, remove it from the list
+                    auto matchIter = std::find(_toRemovedListeners.begin(), _toRemovedListeners.end(), l);
+                    if (matchIter != _toRemovedListeners.end())
+                        _toRemovedListeners.erase(matchIter);
+                    releaseListener(l);
                 }
                 else
                 {
@@ -1083,7 +1214,6 @@ void EventDispatcher::updateListeners(Event* event)
         }
     };
 
-    
     if (event->getType() == Event::Type::TOUCH)
     {
         onUpdateListeners(EventListenerTouchOneByOne::LISTENER_ID);
@@ -1093,9 +1223,6 @@ void EventDispatcher::updateListeners(Event* event)
     {
         onUpdateListeners(__getListenerID(event));
     }
-    
-    if (_inDispatch > 1)
-        return;
     
     CCASSERT(_inDispatch == 1, "_inDispatch should be 1 here.");
     
@@ -1120,6 +1247,11 @@ void EventDispatcher::updateListeners(Event* event)
             forceAddEventListener(listener);
         }
         _toAddedListeners.clear();
+    }
+
+    if (!_toRemovedListeners.empty())
+    {
+        cleanToRemovedListeners();
     }
 }
 
@@ -1196,7 +1328,7 @@ void EventDispatcher::sortEventListenersOfSceneGraphPriority(const EventListener
     visitTarget(rootNode, true);
     
     // After sort: priority < 0, > 0
-    std::sort(sceneGraphListeners->begin(), sceneGraphListeners->end(), [this](const EventListener* l1, const EventListener* l2) {
+    std::stable_sort(sceneGraphListeners->begin(), sceneGraphListeners->end(), [this](const EventListener* l1, const EventListener* l2) {
         return _nodePriorityMap[l1->getAssociatedNode()] > _nodePriorityMap[l2->getAssociatedNode()];
     });
     
@@ -1221,7 +1353,7 @@ void EventDispatcher::sortEventListenersOfFixedPriority(const EventListener::Lis
         return;
     
     // After sort: priority < 0, > 0
-    std::sort(fixedListeners->begin(), fixedListeners->end(), [](const EventListener* l1, const EventListener* l2) {
+    std::stable_sort(fixedListeners->begin(), fixedListeners->end(), [](const EventListener* l1, const EventListener* l2) {
         return l1->getFixedPriority() < l2->getFixedPriority();
     });
     
@@ -1246,7 +1378,7 @@ void EventDispatcher::sortEventListenersOfFixedPriority(const EventListener::Lis
     
 }
 
-EventDispatcher::EventListenerVector* EventDispatcher::getListeners(const EventListener::ListenerID& listenerID)
+EventDispatcher::EventListenerVector* EventDispatcher::getListeners(const EventListener::ListenerID& listenerID) const
 {
     auto iter = _listenerMap.find(listenerID);
     if (iter != _listenerMap.end())
@@ -1283,7 +1415,7 @@ void EventDispatcher::removeEventListenersForListenerID(const EventListener::Lis
                 if (_inDispatch == 0)
                 {
                     iter = listenerVector->erase(iter);
-                    CC_SAFE_RELEASE(l);
+                    releaseListener(l);
                 }
                 else
                 {
@@ -1312,7 +1444,7 @@ void EventDispatcher::removeEventListenersForListenerID(const EventListener::Lis
         if ((*iter)->getListenerID() == listenerID)
         {
             (*iter)->setRegistered(false);
-            (*iter)->release();
+            releaseListener(*iter);
             iter = _toAddedListeners.erase(iter);
         }
         else
@@ -1358,7 +1490,8 @@ void EventDispatcher::removeCustomEventListeners(const std::string& customEventN
 void EventDispatcher::removeAllEventListeners()
 {
     bool cleanMap = true;
-    std::vector<EventListener::ListenerID> types(_listenerMap.size());
+    std::vector<EventListener::ListenerID> types;
+    types.reserve(_listenerMap.size());
     
     for (const auto& e : _listenerMap)
     {
@@ -1414,13 +1547,82 @@ void EventDispatcher::setDirty(const EventListener::ListenerID& listenerID, Dirt
     auto iter = _priorityDirtyFlagMap.find(listenerID);
     if (iter == _priorityDirtyFlagMap.end())
     {
-        _priorityDirtyFlagMap.insert(std::make_pair(listenerID, flag));
+        _priorityDirtyFlagMap.emplace(listenerID, flag);
     }
     else
     {
         int ret = (int)flag | (int)iter->second;
         iter->second = (DirtyFlag) ret;
     }
+}
+
+void EventDispatcher::cleanToRemovedListeners()
+{
+    for (auto& l : _toRemovedListeners)
+    {
+        auto listenersIter = _listenerMap.find(l->getListenerID());
+        if (listenersIter == _listenerMap.end())
+        {
+            releaseListener(l);
+            continue;
+        }
+
+        bool find = false;
+        auto listeners = listenersIter->second;
+        auto fixedPriorityListeners = listeners->getFixedPriorityListeners();
+        auto sceneGraphPriorityListeners = listeners->getSceneGraphPriorityListeners();
+
+        if (sceneGraphPriorityListeners)
+        {
+            auto machedIter = std::find(sceneGraphPriorityListeners->begin(), sceneGraphPriorityListeners->end(), l);
+            if (machedIter != sceneGraphPriorityListeners->end())
+            {
+                find = true;
+                releaseListener(l);
+                sceneGraphPriorityListeners->erase(machedIter);
+            }
+        }
+
+        if (fixedPriorityListeners)
+        {
+            auto machedIter = std::find(fixedPriorityListeners->begin(), fixedPriorityListeners->end(), l);
+            if (machedIter != fixedPriorityListeners->end())
+            {
+                find = true;
+                releaseListener(l);
+                fixedPriorityListeners->erase(machedIter);
+            }
+        }
+
+        if (find)
+        {
+            if (sceneGraphPriorityListeners && sceneGraphPriorityListeners->empty())
+            {
+                listeners->clearSceneGraphListeners();
+            }
+
+            if (fixedPriorityListeners && fixedPriorityListeners->empty())
+            {
+                listeners->clearFixedListeners();
+            }
+        }
+        else
+            CC_SAFE_RELEASE(l);
+    }
+
+    _toRemovedListeners.clear();
+}
+
+void EventDispatcher::releaseListener(EventListener* listener)
+{
+#if CC_ENABLE_GC_FOR_NATIVE_OBJECTS
+    auto sEngine = ScriptEngineManager::getInstance()->getScriptEngine();
+    if (listener && sEngine)
+    {
+        sEngine->releaseScriptObject(this, listener);
+    }
+#endif // CC_ENABLE_GC_FOR_NATIVE_OBJECTS
+    CC_SAFE_RELEASE(listener);
 }
 
 NS_CC_END

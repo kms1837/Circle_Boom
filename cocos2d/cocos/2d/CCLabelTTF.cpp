@@ -1,7 +1,7 @@
 /****************************************************************************
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2010-2012 cocos2d-x.org
-Copyright (c) 2013-2014 Chukong Technologies Inc.
+Copyright (c) 2013-2017 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -23,9 +23,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
-#include "CCLabelTTF.h"
+#include "2d/CCLabelTTF.h"
 #include "2d/CCLabel.h"
-#include "deprecated/CCString.h"
+#include "base/ccUTF8.h"
 
 NS_CC_BEGIN
 
@@ -54,7 +54,7 @@ LabelTTF::~LabelTTF()
 
 LabelTTF * LabelTTF::create()
 {
-    LabelTTF * ret = new LabelTTF();
+    LabelTTF * ret = new (std::nothrow) LabelTTF();
     if (ret)
     {
         ret->autorelease();
@@ -70,7 +70,7 @@ LabelTTF* LabelTTF::create(const std::string& string, const std::string& fontNam
                                const Size &dimensions, TextHAlignment hAlignment, 
                                TextVAlignment vAlignment)
 {
-    LabelTTF *ret = new LabelTTF();
+    LabelTTF *ret = new (std::nothrow) LabelTTF();
     if(ret && ret->initWithString(string, fontName, fontSize, dimensions, hAlignment, vAlignment))
     {
         ret->autorelease();
@@ -82,7 +82,7 @@ LabelTTF* LabelTTF::create(const std::string& string, const std::string& fontNam
 
 LabelTTF * LabelTTF::createWithFontDefinition(const std::string& string, FontDefinition &textDefinition)
 {
-    LabelTTF *ret = new LabelTTF();
+    LabelTTF *ret = new (std::nothrow) LabelTTF();
     if(ret && ret->initWithStringAndTextDefinition(string, textDefinition))
     {
         ret->autorelease();
@@ -186,7 +186,7 @@ void LabelTTF::setFontName(const std::string& fontName)
     _contentDirty = true;
 }
 
-void LabelTTF::enableShadow(const Size &shadowOffset, float shadowOpacity, float shadowBlur, bool updateTexture)
+void LabelTTF::enableShadow(const Size &shadowOffset, float shadowOpacity, float shadowBlur, bool /*updateTexture*/)
 {
     Color4B temp(Color3B::BLACK);
     temp.a = 255 * shadowOpacity;
@@ -194,25 +194,25 @@ void LabelTTF::enableShadow(const Size &shadowOffset, float shadowOpacity, float
     _contentDirty = true;
 }
 
-void LabelTTF::disableShadow(bool updateTexture)
+void LabelTTF::disableShadow(bool /*updateTexture*/)
 {
     _renderLabel->disableEffect();
     _contentDirty = true;
 }
 
-void LabelTTF::enableStroke(const Color3B &strokeColor, float strokeSize, bool updateTexture)
+void LabelTTF::enableStroke(const Color3B &strokeColor, float strokeSize, bool /*updateTexture*/)
 {
     _renderLabel->enableOutline(Color4B(strokeColor),strokeSize);
     _contentDirty = true;
 }
 
-void LabelTTF::disableStroke(bool updateTexture)
+void LabelTTF::disableStroke(bool /*updateTexture*/)
 {
     _renderLabel->disableEffect();
     _contentDirty = true;
 }
 
-void LabelTTF::setFontFillColor(const Color3B &tintColor, bool updateTexture)
+void LabelTTF::setFontFillColor(const Color3B &tintColor, bool /*updateTexture*/)
 {
     _renderLabel->setTextColor(Color4B(tintColor));
 }
@@ -223,9 +223,11 @@ void LabelTTF::setTextDefinition(const FontDefinition& theDefinition)
     _contentDirty = true;
 }
 
-const FontDefinition& LabelTTF::getTextDefinition() const
+const FontDefinition& LabelTTF::getTextDefinition()
 {
-    return _renderLabel->getFontDefinition();
+    auto fontDef = _renderLabel->getFontDefinition();
+    memcpy(&_fontDef, &fontDef, sizeof(FontDefinition));
+    return _fontDef;
 }
 
 void LabelTTF::setBlendFunc(const BlendFunc &blendFunc)
@@ -280,7 +282,8 @@ const Size& LabelTTF::getContentSize() const
 
 Rect LabelTTF::getBoundingBox() const
 {
-    return _renderLabel->getBoundingBox();
+    const_cast<LabelTTF*>(this)->setContentSize(_renderLabel->getContentSize());
+    return Node::getBoundingBox();
 }
 
 #if defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))

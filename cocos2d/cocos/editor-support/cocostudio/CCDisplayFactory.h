@@ -1,5 +1,5 @@
-/****************************************************************************
-Copyright (c) 2013-2014 Chukong Technologies Inc.
+﻿/****************************************************************************
+Copyright (c) 2013-2017 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -25,8 +25,9 @@ THE SOFTWARE.
 #ifndef __CCDISPLAYFACTORY_H__
 #define __CCDISPLAYFACTORY_H__
 
-#include "cocostudio/CCArmatureDefine.h"
-#include "cocostudio/CCDatas.h"
+#include "editor-support/cocostudio/CCArmatureDefine.h"
+#include "editor-support/cocostudio/CCDatas.h"
+#include "editor-support/cocostudio/CocosStudioExport.h"
 
 namespace cocostudio {
 
@@ -38,7 +39,7 @@ class DisplayData;
  *  @js NA
  *  @lua NA
  */
-class DisplayFactory
+class CC_STUDIO_DLL DisplayFactory
 {
 public:
     static void addDisplay(Bone *bone, DecorativeDisplay *decoDisplay, DisplayData *displayData);

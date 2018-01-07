@@ -1,6 +1,6 @@
 /****************************************************************************
  Copyright (c) 2014 cocos2d-x.org
- Copyright (c) 2014 Chukong Technologies Inc.
+ Copyright (c) 2014-2017 Chukong Technologies Inc.
  
  http://www.cocos2d-x.org
  
@@ -23,15 +23,15 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#include "CCEventController.h"
+#include "base/CCEventController.h"
 
 NS_CC_BEGIN
 
 EventController::EventController(ControllerEventType type, Controller* controller, int keyCode)
 : Event(Type::GAME_CONTROLLER)
 , _controllerEventType(type)
-, _keyCode(keyCode)
 , _controller(controller)
+, _keyCode(keyCode)
 , _isConnected(true)
 {
     
@@ -41,8 +41,8 @@ EventController::EventController(ControllerEventType type, Controller* controlle
 : Event(Type::GAME_CONTROLLER)
 , _controllerEventType(type)
 , _controller(controller)
-, _isConnected(isConnected)
 , _keyCode(0)
+, _isConnected(isConnected)
 {
     
 }

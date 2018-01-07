@@ -1,5 +1,5 @@
 /****************************************************************************
- Copyright (c) 2013-2014 Chukong Technologies Inc.
+ Copyright (c) 2013-2017 Chukong Technologies Inc.
 
  http://www.cocos2d-x.org
 
@@ -27,6 +27,7 @@
 #include "renderer/ccGLStateCache.h"
 #include "renderer/CCTextureAtlas.h"
 #include "renderer/CCTexture2D.h"
+#include "renderer/CCGLProgram.h"
 
 NS_CC_BEGIN
 
@@ -39,19 +40,24 @@ BatchCommand::BatchCommand()
     _shader = nullptr;
 }
 
-void BatchCommand::init(float globalOrder, GLProgram* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const Mat4& modelViewTransform)
+void BatchCommand::init(float globalOrder, GLProgram* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const Mat4& modelViewTransform, uint32_t flags)
 {
-    CCASSERT(shader, "shader cannot be nill");
-    CCASSERT(textureAtlas, "textureAtlas cannot be nill");
+    CCASSERT(shader, "shader cannot be null");
+    CCASSERT(textureAtlas, "textureAtlas cannot be null");
     
-    _globalOrder = globalOrder;
+    RenderCommand::init(globalOrder, modelViewTransform, flags);
     _textureID = textureAtlas->getTexture()->getName();
     _blendType = blendType;
     _shader = shader;
-
+    
     _textureAtlas = textureAtlas;
-
+    
     _mv = modelViewTransform;
+}
+
+void BatchCommand::init(float globalOrder, GLProgram* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const Mat4& modelViewTransform)
+{
+    init(globalOrder, shader, blendType, textureAtlas, modelViewTransform, 0);
 }
 
 BatchCommand::~BatchCommand()

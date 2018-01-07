@@ -1,5 +1,5 @@
 /****************************************************************************
- Copyright (c) 2013-2014 Chukong Technologies Inc.
+ Copyright (c) 2013-2017 Chukong Technologies Inc.
 
  http://www.cocos2d-x.org
 
@@ -24,18 +24,61 @@
  ****************************************************************************/
 
 #include "base/CCEventMouse.h"
+#include "base/CCDirector.h"
 
 NS_CC_BEGIN
 
 EventMouse::EventMouse(MouseEventType mouseEventCode)
 : Event(Type::MOUSE)
 , _mouseEventType(mouseEventCode)
-, _mouseButton(-1)
+, _mouseButton(MouseButton::BUTTON_UNSET)
 , _x(0.0f)
 , _y(0.0f)
 , _scrollX(0.0f)
 , _scrollY(0.0f)
+, _startPointCaptured(false)
 {
 };
 
+// returns the current touch location in screen coordinates
+Vec2 EventMouse::getLocationInView() const 
+{ 
+    return _point; 
+}
+
+// returns the previous touch location in screen coordinates
+Vec2 EventMouse::getPreviousLocationInView() const 
+{ 
+    return _prevPoint; 
+}
+
+// returns the start touch location in screen coordinates
+Vec2 EventMouse::getStartLocationInView() const 
+{ 
+    return _startPoint; 
+}
+
+// returns the current touch location in OpenGL coordinates
+Vec2 EventMouse::getLocation() const
+{ 
+    return Director::getInstance()->convertToGL(_point); 
+}
+
+// returns the previous touch location in OpenGL coordinates
+Vec2 EventMouse::getPreviousLocation() const
+{ 
+    return Director::getInstance()->convertToGL(_prevPoint);  
+}
+
+// returns the start touch location in OpenGL coordinates
+Vec2 EventMouse::getStartLocation() const
+{ 
+    return Director::getInstance()->convertToGL(_startPoint);  
+}
+
+// returns the delta position between the current location and the previous location in OpenGL coordinates
+Vec2 EventMouse::getDelta() const
+{     
+    return getLocation() - getPreviousLocation();
+}
 NS_CC_END

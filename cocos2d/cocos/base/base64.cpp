@@ -1,6 +1,6 @@
 /****************************************************************************
 Copyright (c) 2010-2012 cocos2d-x.org
-Copyright (c) 2013-2014 Chukong Technologies Inc.
+Copyright (c) 2013-2017 Chukong Technologies Inc.
  
 http://www.cocos2d-x.org
 
@@ -68,7 +68,7 @@ int _base64Decode(const unsigned char *input, unsigned int input_len, unsigned c
         switch (char_count) {
             case 1:
 #if (CC_TARGET_PLATFORM != CC_PLATFORM_BADA)
-                std::fprintf(stderr, "base64Decode: encoding incomplete: at least 2 bits missing");
+                fprintf(stderr, "base64Decode: encoding incomplete: at least 2 bits missing");
 #endif
                 errors++;
                 break;
@@ -83,7 +83,7 @@ int _base64Decode(const unsigned char *input, unsigned int input_len, unsigned c
     } else if ( input_idx < input_len ) {
         if (char_count) {
 #if (CC_TARGET_PLATFORM != CC_PLATFORM_BADA)
-            std::fprintf(stderr, "base64 encoding incomplete: at least %d bits truncated",
+            fprintf(stderr, "base64 encoding incomplete: at least %d bits truncated",
                     ((4 - char_count) * 6));
 #endif
             errors++;
@@ -142,7 +142,7 @@ int base64Decode(const unsigned char *in, unsigned int inLength, unsigned char *
     unsigned int outLength = 0;
     
     //should be enough to store 6-bit buffers in 8-bit buffers
-    *out = (unsigned char*)malloc(inLength * 3.0f / 4.0f + 1);
+    *out = (unsigned char*)malloc(inLength / 4 * 3 + 1);
     if( *out ) {
         int ret = _base64Decode(in, inLength, *out, &outLength);
         
@@ -160,7 +160,7 @@ int base64Decode(const unsigned char *in, unsigned int inLength, unsigned char *
 }
 
 int base64Encode(const unsigned char *in, unsigned int inLength, char **out) {
-    unsigned int outLength = inLength * 4 / 3 + (inLength % 3 > 0 ? 4 : 0);
+    unsigned int outLength = (inLength + 2) / 3 * 4;
     
     //should be enough to store 8-bit buffers in 6-bit buffers
     *out = (char*)malloc(outLength+1);

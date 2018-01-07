@@ -1,5 +1,5 @@
-/****************************************************************************
-Copyright (c) 2013-2014 Chukong Technologies Inc.
+﻿/****************************************************************************
+Copyright (c) 2013-2017 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -25,13 +25,14 @@ THE SOFTWARE.
 #ifndef __CCDECORATIVEDISPLAY_H__
 #define __CCDECORATIVEDISPLAY_H__
 
-#include "cocostudio/CCArmatureDefine.h"
-#include "cocostudio/CCDisplayFactory.h"
-#include "cocostudio/CCDatas.h"
+#include "editor-support/cocostudio/CCArmatureDefine.h"
+#include "editor-support/cocostudio/CCDisplayFactory.h"
+#include "editor-support/cocostudio/CCDatas.h"
+#include "editor-support/cocostudio/CocosStudioExport.h"
 
 
 #if ENABLE_PHYSICS_BOX2D_DETECT || ENABLE_PHYSICS_CHIPMUNK_DETECT || ENABLE_PHYSICS_SAVE_CALCULATED_VERTEX
-#include "cocostudio/CCColliderDetector.h"
+#include "editor-support/cocostudio/CCColliderDetector.h"
 #endif
 
 namespace cocos2d {
@@ -43,7 +44,7 @@ namespace cocostudio {
  *  @js NA
  *  @lua NA
  */
-class  DecorativeDisplay: public cocos2d::Ref
+class CC_STUDIO_DLL DecorativeDisplay: public cocos2d::Ref
 {
 public:
     static DecorativeDisplay *create();

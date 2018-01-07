@@ -1,5 +1,5 @@
 /****************************************************************************
- Copyright (c) 2014 Chukong Technologies Inc.
+ Copyright (c) 2014-2017 Chukong Technologies Inc.
  
  http://www.cocos2d-x.org
  
@@ -29,33 +29,40 @@
 #include <vector>
 
 #include "base/CCRef.h"
-#include "base/CCPlatformMacros.h"
+#include "platform/CCPlatformMacros.h"
 #include "base/CCConsole.h"
 
 NS_CC_BEGIN
 
 /**
- * BundleReader is an interface for reading sequence of bytes.
+ * @addtogroup _3d
+ * @{
+ */
+
+/**
+ * @brief BundleReader is an interface for reading sequence of bytes.
+ * @js NA
+ * @lua NA
  */
 class BundleReader: public cocos2d::Ref
 {
 public:
     /**
-     * Structor
+     * Constructor
      */
     BundleReader();
     
     /**
-     * inicial
+     * Destructor
      */
     ~BundleReader();
     
     /**
      * initialise
-     * @param lpbuffer The data buffer pointer
+     * @param buffer The data buffer pointer
      * @param length The data buffer size
      */
-    void init(char* lpbuffer, ssize_t length);
+    void init(char* buffer, ssize_t length);
 
     /**
      * Reads an array of elements.
@@ -87,7 +94,7 @@ public:
     /**
      * Returns the position of the file pointer.
      */
-    long int tell();
+    ssize_t tell();
 
     /**
      * Sets the position of the file pointer.
@@ -109,13 +116,20 @@ public:
      * first read length, then read string text
      */
     std::string readString();
+
+    /**
+     * Read the matrix.
+     * @note the matrix type must be the 4*4 float matrix
+     */
     bool readMatrix(float* m);
 
 private:
-    ssize_t m_position;
-    ssize_t  m_length;
-    char* m_buffer;
+    ssize_t _position;
+    ssize_t  _length;
+    char* _buffer;
 };
+
+/// @cond 
 
 /**
 * template read routines
@@ -149,7 +163,7 @@ inline bool BundleReader::readArray(unsigned int *length, std::vector<T> *values
 }
 
 /**
-* specalization for char
+* specialization for char
 */
 template<>
 inline bool BundleReader::read<char>(char *ptr)
@@ -166,10 +180,10 @@ inline bool BundleReader::read<char>(char *ptr)
 }
 
 /**
-* specalization for std::string
+* specialization for std::string
 */
 template<>
-inline bool BundleReader::read<std::string>(std::string *ptr)
+inline bool BundleReader::read<std::string>(std::string* /*ptr*/)
 {
     CCLOG("can not read std::string, use readString() instead");
     return false;
@@ -196,6 +210,10 @@ inline bool BundleReader::readArray<std::string>(unsigned int *length, std::vect
     return true;
 }
 
+/// @endcond
+
+// end of 3d group
+/// @}
 
 NS_CC_END
 

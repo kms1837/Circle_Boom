@@ -1,295 +1,101 @@
-# cocos2d-x v3.2 Release Notes #
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+- [Cocos2d-x 3.16 Release Notes](#cocos2d-x-316-release-notes)
+- [Misc Information](#misc-information)
+- [v3.16](#v316)
+  - [Highlights](#highlights)
+  - [Highlights in detail](#highlights-in-detail)
+    - [Better support [`creator_to_cocos2dx`][1]](#better-support-creator_to_cocos2dx1)
+    - [LayerRaidalGradient](#layerraidalgradient)
+    - [Lua app crashed on iOS simulator with Xcode 8.0+](#lua-app-crashed-on-ios-simulator-with-xcode-80)
+    - [Cocos Studio](#cocos-studio)
+    - [Improve compiling speed](#improve-compiling-speed)
+    - [Remove some platforms support](#remove-some-platforms-support)
 
-- [cocos2d-x v3.2 Release Notes](#user-content-cocos2d-x-v32-release-notes)
-- [Misc Information](#user-content-misc-information)
-- [Requirements](#user-content-requirements)
-	- [Runtime Requirements](#user-content-runtime-requirements)
-	- [Compiler Requirements](#user-content-compiler-requirements)
-	- [How to run tests](#user-content-how-to-run-tests)
-		- [Mac OSX & iOS](#user-content-mac-osx--ios)
-		- [Android](#user-content-android)
-		- [Windows](#user-content-windows)
-		- [Linux](#user-content-linux)
-	- [How to start a new game](#user-content-how-to-start-a-new-game)
-- [Highlights of v3.2](#user-content-highlights-of-v32)
-- [Documents](#user-content-documents)
-- [Toolchain requirement changed](#user-content-toolchain-requirement-changed)
-- [atof issue on Android](#user-content-atof-issue-on-android)
-- [Features in detail](#user-content-features-in-detail)
-	- [Sprite3D & Animation3D](#user-content-sprite3d--animation3d)
-		- [fbx-conv usage](#user-content-fbx-conv-usage)
-	- [Game controller](#user-content-game-controller)
-	- [Fast tilemap](#user-content-fast-tilemap)
-	- [Node::enumerateChildren](#user-content-nodeenumeratechildren)
-	- [utils::findChildren](#user-content-utilsfindchildren)
-	- [Node::setNormalizedPosition](#user-content-nodesetnormalizedposition)
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# Cocos2d-x 3.16 Release Notes #
 
 # Misc Information
 
-* Download: http://cdn.cocos2d-x.org/cocos2d-x-3.2.zip
-* Full Changelog: https://github.com/cocos2d/cocos2d-x/blob/cocos2d-x-3.2/CHANGELOG
-* API Reference: http://www.cocos2d-x.org/reference/native-cpp/V3.2/index.html
-* v3.0 Release Notes can be found here: [v3.0 Release Notes](https://github.com/cocos2d/cocos2d-x/blob/cocos2d-x-3.0/docs/RELEASE_NOTES.md)
+* [Full Changelog](https://github.com/cocos2d/cocos2d-x/blob/v3/CHANGELOG)
 
-# Requirements
+# v3.16
 
-## Runtime Requirements
+Android tool version tested in this version:
 
-* Android 2.3 or newer
-* iOS 5.0 or newer
-* OS X 10.7 or newer
-* Windows 7 or newer
-* Windows Phone 8 or newer
-* Linux Ubuntu 14.04 or newer
-* ~~Browsers via Emscripten~~ N/A for the moment
+- Android Studio 2.3.3
+- NDK r14
 
-## Compiler Requirements
+## Highlights
 
-* Xcode 5.1 or newer for iOS or Mac
-* gcc 4.9 or newer for Linux
-* ndk-r9d or newer for Android
-* Visual Studio 2012  or newer for Windows (win32)
-* Visual Studio 2012  or newer for Windows Phone 8
+- better support [`creator_to_cocos2dx`][1] creator plugin
+- add __LayerRadiaGradientLayer__
+- update to support Android Studio 2.3.3
+- fix the issue that lua projects will crash on iOS simulator with Xcode 8.0+
+- revert CocosStudio reader and flatbuffer
+- fix compling error with iOS 11
+- use prebuit bullet to improve compiling speed
+- remove supporting of Windows 10 metro, Windows Phones and Tizen
+- update to Spine v3.5.35 and support skeleton batching in web engine
 
-## How to run tests
+## Highlights in detail
 
-### Mac OSX & iOS
+### Better support [`creator_to_cocos2dx`][1]
 
-* Enter `cocos2d-x/build` folder, open `cocos2d_test.xcodeproj`
-* Select `iOS` or `OS X` target in scheme toolbar
-* Click `run` button
+[`creator_to_cocos2dx`][1] is a [Cocos Creator][2] plugin that will export Scene information created by [Cocos Creator][2] for cocos2d-x C++/Lua projects. We mention it as __plugin__ following.
 
-### Android
+With this plugin, you can use [Cocos Creator][2] as Scene editor for cocos2d-x. Curretly, the plugin supports [these features](3), and will continue to add more features. As you can see, RichText img tag support only works in cocos2d-x v3.16+ because of cocos2d-x's limitation. So cocos2d-x will continue to be improved to support more [Cocos Creator][2] features.
 
-You can run the samples...
+More detail information and usage please refer to plugin's [the README][1]. You are appreciated if you can use it and give feedback.
 
-**Using command line:**
+![][4]
+__Scene effect in cocos creator__
 
-    $ cd cocos2d-x
-    $ ./setup.py
-    $ cd build
-    $ ./android-build.py cpp-empty-test -p 10
-    $ adb install cocos2d-x/tests/cpp-empty-test/proj.android/bin/CppEmptyTest-debug.apk
-    
-Then click item on Android device to run tests. Available value of `-p` is the API level, cocos2d-x supports from level 10.
+![][5]
+__Scene effect in cocos2d-x__
 
-**Using Eclipse:**
+### LayerRaidalGradient
 
-    $ cd cocos2d-x
-    $ ./setup.py
-    $ cd build
-    $ ./android-build.py cpp-empty-test -p 10
-    
-Then
+LayerRadialGradient is similar to LayerColor, but will only draw color in a circle.
 
-* Import cocos2d-x Android project into Eclipse, the path used to import is `cocos/2d/platform/android`
-* Import `cpp-empty-test` Android project into Eclipse, the path used to import is `tests/cpp-empty-test/proj.android`
-* Build `cpp-empty-test` Android project and run
+![][6]
 
-### Windows
+### Lua app crashed on iOS simulator with Xcode 8.0+
 
-* Enter `cocos2d-x/build`, and open `cocos2d-win32.vs2012.sln`
-* Select `cpp-empty-test` as running target
-* Click run button
+After updating to Xcode 8.0+, lua projects will crash on iOS simulator. It is a bug of luagit. In this version, the bug it is fixed. You can just update [luajit][7] if you don't want to update cocos2d-x.
 
+### Fix compiling error with iOS 11
 
-### Linux
+Before cocos2d-x v3.16, `CCFileUtils` uses `system()` to remove a directory. iOS 11 remove `system`, so will cause compiling error with iOS 11. This version fixes this issue. The corresponding PR for this issue is [here](https://github.com/cocos2d/cocos2d-x/pull/17921), you can apply this PR to fix it if you don't want to upgrade to v3.16.
 
-    $ cd cocos2d-x/build
-    $ ./install-deps-linux.sh
-    $ cd ../..
-    
-Then
+### Cocos Studio
 
-    $ mkdir build
-    $ cd build
-    $ cmake ../cocos2d-x
-    $ make -j4
-    
-Run
+coocs2d-x v3.15 updates flatbuffer, which breaks compatibility of Cocos Studio. In this version, we revert flatbuffer and Cocos Studio reader.
 
-    $ cd bin/cpp-empty-test
-    $ ./cpp-empty-test
-    
-## How to start a new game
+If you don't want to update cocos2d-x, you can replace flatbuffer and Cocos Studio reader shift in this version.
 
-Please refer to this document: [ReadMe](../README.md)
+### Improve compiling speed
 
-# Highlights of v3.2
+As bullet is not needed for most developers, so we use prebuilt bullet. It will speed up compiling speed, and we will continue to use more prebuilt 3rd party libraries, such as 3d particles, Box2D and so on to speed up compiling speed.
 
-* `Animation3D`/`Animate3D`, new nodes for 3d animation
-* `fbx-conv` supports generating binary format which is supported by `Sprite3D`
-* Game controller support
-* Fast tilemap support
-* Added `utils::cpatureScreen` to take screenshot
-* Physics body supports scale and rotation
-* Added `Node::enumerateChildren` and `utils::findChildren`, and support c++ 11 regular expression
-* Added `Node::setNormalizedPosition`, `Node`'s position in pixel will be calculated according its parent's content size
+We also fix many warnings too in this version. As some warnings are imported by 3rd party libaries, so we can not treat warnings as error, but we will continue to achieve it.
 
-# Documents
+### Remove some platforms support
 
-* [Sprite3D & Animation3D](http://cocos2d-x.org/wiki/Sprite3D)
-* [Game controller](http://www.cocos2d-x.org/wiki/Game_Controller)
-* [How to compile shader on WP8](http://cocos2d-x.org/wiki/How_to_update_wp8_shader)
+As we are lack of human resources, so we remove some platforms.
 
-# Toolchain requirement changed
+MS maintians Win10 related platform, but it doesn't continue to maintain it. So we remove it. Which means cocos2d-x based games can not run on Win10 metro mode and Windows Phones, but you can run it in Win32 mode.
 
-`Node::enumerateChildren()` uses `std::regex` which will cause crash using gcc v4.8 or lower version. 
-Because `OTHER_LDFLAGS` can not work in Xcode6 beta3. So we used fat library(including 64-bit libaries) on iOS. But Xcode 5.0 or lower version has building problem by this way.
+Tizen platform is removed too because of huaman resources.
 
-So
 
-* NDK r9d or newer version is required for Android building
-* gcc 4.9 is required for linux building
-* Xcode 5.1 or newer is required on iOS
-
-# atof issue on Android
-
-We found a bug of `atof` on Android when using libc++. The bug is that, the return value of `atof` may be `-inf` when passing some valid digit string.
-
-For example
-
-```c++
-atof("90.099998474121094"); // -> return value is -inf
-```
-
-We have reported it to google guys, and they confirmed that it is a bug. In order to work around this issue, we added `utils::atof()`.
-
-The corresponding pull request for this issue is [here](https://github.com/cocos2d/cocos2d-x/pull/7440). You can refer to this pull request for demail information.
-
-# Features in detail
-
-## Sprite3D & Animation3D
-
-Sample code to use binary version
-```c++
-auto sprite3d = Sprite3D::create("filename.c3b");
-addChild(sprite3d);
-
-auto animation3d = Animation3D("filename.c3b");
-auto animate3d = Animate3D::create(animation3d);
-sprite3d->runAction(RepeatForEver::create(animate));
-```
-
-Detail information please refer to [Sprite3D & Animation3D](http://cocos2d-x.org/wiki/Sprite3D).
-
-### `fbx-conv` usage
-
-* Mac OS X
-
-```
-$ cd COCOS2DX_ROOT/tools/fbx-conv/mac
-$ ./fbx-conv [-a|-b|-t] FBXFile
-```
-
-* Windows
-
-```
-cd COCOS2DX_ROOT/tools/fbx-conv/windows
-fbx-conv [-a|-b|-t] FBXFile
-```
-
-Options:
-
-* -a: export both text and binary format
-* -b: export binary format
-* -t: export text format
-
-## Game controller
-
-Supported controller type:
-
-* Android standard controllers
-* Amazon tv
-* OUYA
-* Moga
-* Nibiru
-* iOS standard controllers
-
-Sample codes
-```c++
-// register event listener
-auto listener = EventListenerController::create();
-listner->onKeyDown = ...
-...
-eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-
-// start connecting controller
-Controller::startDiscoveryController();
-
-// handler key down/ key up event
-void GameControllerTest::onKeyDown(Controller *controller, int keyCode, Event *event)
-{
-    switch (keyCode)
-    {
-        case Controller::Key::BUTTON_A:
-        ...
-        break;
-        
-        ...
-    }
-}
-```
-
-Detail information please refer to [Game controller](http://www.cocos2d-x.org/wiki/Game_Controller).
-
-## Fast tilemap
-
-Fast tilemap has the same API as `TMXTiledMap` without deprecated functions.
-
-Sample code
-```c++
-auto tilemap = cocos2d::experimental::TMXTiledMap::create("MyFile.tmx");
-addChild(tilemap);
-```
-
-Full demo please refer to `COCOS2DX_ROOT/tests/cpp-tests/Classes/TileMapTest/TileMapTest2.cpp`.
-
-## Node::enumerateChildren
-
-This functions is used to enumerate children of a `Node`. It supports c++ 11 regular expression.
-
-```c++
-// Find nodes whose name is 'nameToFind' and end with digits.
-node->enumerateChildren("nameToFind[[:digit:]]+", [](Node* node) -> bool {
-    ...
-    return false; // return true to stop at first match
-});
-
-// Find nodes whose name is 'nameToFind' and end with digits recursively.
-node->enumerateChildren("nameToFind[[:digit:]]+", [](Node* node) -> bool {
-    ...
-    return false; // return true to stop at first match
-});
-```
-
-Full test please refer to `NodeNameTest` in `COCOS2DX_ROOT/tests/cpp-tests/NodeTest/NodeTest.cpp`.
-
-Because this function uses `std::regex` which is not supported well in gcc 4.8 or lower version. So we use `clang` and `stdc++` instead for Android building. This lead to the result that `NDK r9d` or newer is required. And `gcc 4.9` is required on linux.
-
-## utils::findChildren
-
-This is a helper function to find children of a `Node` share a name. The implementation of this function bases on `Node::enumerateChildren`.
-
-```c++
-auto children = utils::findChildren(node, "nameToFind");
-
-...
-```
-
-## Node::setNormalizedPosition
-
-Can use this function to set Node's position(x,y) using value between 0 and 1. `Can use this function when it has a parent node.` The positions in pixels is calculated like the following:
-
-```c++
-// pseudo code
-void setNormalizedPosition(Vec2 pos)
-{
-    Size s = getParent()->getContentSize();
-    _position = pos * s;
-}
-```
-
-Full test please refer to `NodeNormalizedPositionTest1/2` in `tests/cpp-tests/Classes/NodeTest/NodeTest.cpp`.
+[1]: https://github.com/cocos2d/creator_to_cocos2dx
+[2]: http://cocos2d-x.org/creator
+[3]: https://github.com/cocos2d/creator_to_cocos2dx#limitations
+[4]: https://raw.githubusercontent.com/minggo/Pictures/master/creator-ui-effect.png
+[5]: https://raw.githubusercontent.com/minggo/Pictures/master/cocos2dx-ui-effect.png
+[6]: https://raw.githubusercontent.com/minggo/Pictures/master/layerradialgradient.png
+[7]: https://github.com/cocos2d/cocos2d-x-3rd-party-libs-bin/tree/v3/lua/luajit/prebuilt/ios "luajit.a"

@@ -1,5 +1,5 @@
 /****************************************************************************
- Copyright (c) 2013-2014 Chukong Technologies Inc.
+ Copyright (c) 2013-2017 Chukong Technologies Inc.
  
  http://www.cocos2d-x.org
  
@@ -38,7 +38,7 @@ VBox::~VBox()
 
 VBox* VBox::create()
 {
-    VBox* widget = new VBox();
+    VBox* widget = new (std::nothrow) VBox();
     if (widget && widget->init())
     {
         widget->autorelease();
@@ -50,7 +50,7 @@ VBox* VBox::create()
 
 VBox* VBox::create(const cocos2d::Size &size)
 {
-    VBox* widget = new VBox();
+    VBox* widget = new (std::nothrow) VBox();
     if (widget && widget->initWithSize(size))
     {
         widget->autorelease();

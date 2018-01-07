@@ -43,7 +43,7 @@
 #ifndef _unz64_H
 #define _unz64_H
 
-#include "CCPlatformDefine.h"
+#include "platform/CCPlatformDefine.h"
 
 #ifndef _ZLIB_H
 #include "zlib.h"
@@ -180,6 +180,7 @@ unzFile CC_DLL unzOpen64 OF((const void *path));
        does not describe the reality
 */
 
+unzFile CC_DLL unzOpenBuffer OF((const void* buffer, uLong size));
 
 unzFile CC_DLL unzOpen2 OF((const char *path,
                                     zlib_filefunc_def* pzlib_filefunc_def));

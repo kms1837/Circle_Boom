@@ -29,8 +29,14 @@
 
 #include <mutex>
 
-#include "cocos2d.h"
+#include "2d/CCNode.h"
 #include "extensions/ExtensionMacros.h"
+#include "extensions/ExtensionExport.h"
+
+
+namespace cocos2d { namespace network {
+    class Downloader;
+}}
 
 NS_CC_EXT_BEGIN
 
@@ -41,7 +47,7 @@ class AssetsManagerDelegateProtocol;
  *  The updated package should be a zip file. And there should be a file named
  *  version in the server, which contains version code.
  */
-class AssetsManager : public Node
+class CC_EX_DLL AssetsManager : public Node
 {
 public:
     enum class ErrorCode
@@ -49,7 +55,7 @@ public:
         // Error caused by creating a file to store downloaded data
         CREATE_FILE,
         /** Error caused by network
-         -- network unavaivable
+         -- network unavailable
          -- timeout
          -- ...
          */
@@ -73,6 +79,7 @@ public:
      * @param versionFileUrl URL of version file. It should contain version code of new package.
      * @param storagePath The path to store downloaded resources.
      * @js NA
+     * @lua new
      */
     AssetsManager(const char* packageUrl = NULL, const char* versionFileUrl = NULL, const char* storagePath = NULL);
     /**
@@ -132,7 +139,7 @@ public:
     /* @brief Sets storage path.
      *
      * @param storagePath The path to store downloaded resources.
-     * @warm The path should be a valid path.
+     * @warning The path should be a valid path.
      */
     void setStoragePath(const char* storagePath);
     
@@ -152,31 +159,16 @@ public:
      */
     void setConnectionTimeout(unsigned int timeout);
     
-    /** @brief Gets connection time out in secondes
+    /** @brief Gets connection time out in seconds
      */
     unsigned int getConnectionTimeout();
-    
-    /* downloadAndUncompress is the entry of a new thread 
-     */
-    friend int assetsManagerProgressFunc(void *, double, double, double, double);
 
 protected:
-    bool downLoad();
     void checkStoragePath();
     bool uncompress();
-    bool createDirectory(const char *path);
     void setSearchPath();
     void downloadAndUncompress();
 
-private:
-    /** @brief Initializes storage path.
-     */
-    void createStoragePath();
-    
-    /** @brief Destroys storage path.
-     */
-    void destroyStoragePath();
-    
 private:
     //! The path to store downloaded resources.
     std::string _storagePath;
@@ -189,7 +181,7 @@ private:
     
     std::string _downloadedVersion;
     
-    void *_curl;
+    cocos2d::network::Downloader* _downloader;
 
     unsigned int _connectionTimeout;
     

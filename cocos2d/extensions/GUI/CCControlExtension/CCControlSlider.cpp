@@ -89,7 +89,7 @@ ControlSlider* ControlSlider::create(const char* bgFile, const char* progressFil
 
 ControlSlider* ControlSlider::create(Sprite * backgroundSprite, Sprite* pogressSprite, Sprite* thumbSprite)
 {
-    ControlSlider *pRet = new ControlSlider();
+    ControlSlider *pRet = new (std::nothrow) ControlSlider();
     pRet->initWithSprites(backgroundSprite, pogressSprite, thumbSprite);
     pRet->autorelease();
     return pRet;
@@ -98,7 +98,7 @@ ControlSlider* ControlSlider::create(Sprite * backgroundSprite, Sprite* pogressS
 ControlSlider* ControlSlider::create(Sprite * backgroundSprite, Sprite* pogressSprite, Sprite* thumbSprite,
         Sprite* selectedThumbSprite)
 {
-    ControlSlider *pRet = new ControlSlider();
+    ControlSlider *pRet = new (std::nothrow) ControlSlider();
     pRet->initWithSprites(backgroundSprite, pogressSprite, thumbSprite, selectedThumbSprite);
     pRet->autorelease();
     return pRet;
@@ -122,7 +122,7 @@ bool ControlSlider::initWithSprites(Sprite * backgroundSprite, Sprite* progressS
         CCASSERT(thumbSprite,           "Thumb sprite must be not nil");
         CCASSERT(selectedThumbSprite,   "Thumb sprite must be not nil");
 
-        ignoreAnchorPointForPosition(false);
+        setIgnoreAnchorPointForPosition(false);
 
         this->setBackgroundSprite(backgroundSprite);
         this->setProgressSprite(progressSprite);
@@ -136,19 +136,19 @@ bool ControlSlider::initWithSprites(Sprite * backgroundSprite, Sprite* progressS
         
         // Add the slider background
         _backgroundSprite->setAnchorPoint(Vec2(0.5f, 0.5f));
-        _backgroundSprite->setPosition(Vec2(this->getContentSize().width / 2, this->getContentSize().height / 2));
+        _backgroundSprite->setPosition(this->getContentSize().width / 2, this->getContentSize().height / 2);
         addChild(_backgroundSprite);
 
         // Add the progress bar
         _progressSprite->setAnchorPoint(Vec2(0.0f, 0.5f));
-        _progressSprite->setPosition(Vec2(0.0f, this->getContentSize().height / 2));
+        _progressSprite->setPosition(0.0f, this->getContentSize().height / 2);
         addChild(_progressSprite);
 
         // Add the slider thumb  
-        _thumbSprite->setPosition(Vec2(0.0f, this->getContentSize().height / 2));
+        _thumbSprite->setPosition(0.0f, this->getContentSize().height / 2);
         addChild(_thumbSprite);
         
-        _selectedThumbSprite->setPosition(Vec2(0.0f, this->getContentSize().height / 2));
+        _selectedThumbSprite->setPosition(0.0f, this->getContentSize().height / 2);
         _selectedThumbSprite->setVisible(false);
         addChild(_selectedThumbSprite);
 
@@ -246,7 +246,7 @@ Vec2 ControlSlider::locationFromTouch(Touch* touch)
 }
 
 
-bool ControlSlider::onTouchBegan(Touch* touch, Event* pEvent)
+bool ControlSlider::onTouchBegan(Touch* touch, Event* /*pEvent*/)
 {
     if (!isTouchInside(touch) || !isEnabled() || !isVisible())
     {
@@ -258,13 +258,13 @@ bool ControlSlider::onTouchBegan(Touch* touch, Event* pEvent)
     return true;
 }
 
-void ControlSlider::onTouchMoved(Touch *pTouch, Event *pEvent)
+void ControlSlider::onTouchMoved(Touch *pTouch, Event* /*pEvent*/)
 {
     Vec2 location = locationFromTouch(pTouch);
     sliderMoved(location);
 }
 
-void ControlSlider::onTouchEnded(Touch *pTouch, Event *pEvent)
+void ControlSlider::onTouchEnded(Touch* /*pTouch*/, Event* /*pEvent*/)
 {
     sliderEnded(Vec2::ZERO);
 }
@@ -303,7 +303,7 @@ void ControlSlider::sliderMoved(Vec2 location)
     setValue(valueForLocation(location));
 }
 
-void ControlSlider::sliderEnded(Vec2 location)
+void ControlSlider::sliderEnded(Vec2 /*location*/)
 {
     if (this->isSelected())
     {

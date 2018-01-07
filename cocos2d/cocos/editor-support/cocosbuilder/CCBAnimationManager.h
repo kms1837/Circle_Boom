@@ -7,20 +7,21 @@
 #include "2d/CCActionEase.h"
 
 #include "extensions/ExtensionMacros.h"
-#include "CCBSequence.h"
-#include "CCBSequenceProperty.h"
+#include "editor-support/cocosbuilder/CCBSequence.h"
+#include "editor-support/cocosbuilder/CCBKeyframe.h"
+#include "editor-support/cocosbuilder/CCBSequenceProperty.h"
 #include "extensions/GUI/CCControlExtension/CCControl.h"
 
 namespace cocosbuilder {
 
-class CCBAnimationManagerDelegate
+class CC_DLL CCBAnimationManagerDelegate
 {
 public:
     virtual ~CCBAnimationManagerDelegate() {}
     virtual void completedAnimationSequenceNamed(const char *name) = 0;
 };
 
-class CCBAnimationManager : public cocos2d::Ref
+class CC_DLL CCBAnimationManager : public cocos2d::Ref
 {
 public:
     bool _jsControlled;
@@ -111,7 +112,7 @@ public:
     cocos2d::Sequence* actionForCallbackChannel(CCBSequenceProperty* channel);
     cocos2d::Sequence* actionForSoundChannel(CCBSequenceProperty* channel);
 
-	// return -1 if timeline not exsit
+	// return -1 if timeline not exist
     int getSequenceId(const char* pSequenceName);
     
     // get timeline duration
@@ -123,7 +124,7 @@ private:
     
     CCBSequence* getSequence(int nSequenceId);
     cocos2d::ActionInterval* getAction(CCBKeyframe *pKeyframe0, CCBKeyframe *pKeyframe1, const std::string& propName, cocos2d::Node *pNode);
-    void setAnimatedProperty(const std::string& propName,cocos2d::Node *pNode, const cocos2d::Value& value, Ref* obj, float fTweenDuraion);
+    void setAnimatedProperty(const std::string& propName, cocos2d::Node *pNode, const cocos2d::Value& value, Ref* obj, float fTweenDuration);
     void setFirstFrame(cocos2d::Node *pNode, CCBSequenceProperty *pSeqProp, float fTweenDuration);
     cocos2d::ActionInterval* getEaseAction(cocos2d::ActionInterval *pAction, CCBKeyframe::EasingType easingType, float fEasingOpt);
     void runAction(cocos2d::Node *pNode, CCBSequenceProperty *pSeqProp, float fTweenDuration);
@@ -160,7 +161,7 @@ private:
     
 };
 
-class CCBSetSpriteFrame : public cocos2d::ActionInstant
+class CC_DLL CCBSetSpriteFrame : public cocos2d::ActionInstant
 {
 public:
     /** creates a Place action with a position */
@@ -183,7 +184,7 @@ private:
 };
 
 
-class CCBSoundEffect : public cocos2d::ActionInstant
+class CC_DLL CCBSoundEffect : public cocos2d::ActionInstant
 {
 public:
     static CCBSoundEffect* actionWithSoundFile(const std::string &file, float pitch, float pan, float gain);
@@ -205,7 +206,7 @@ private:
 };
 
 
-class CCBRotateTo : public cocos2d::ActionInterval
+class CC_DLL CCBRotateTo : public cocos2d::ActionInterval
 {
 public:
     static CCBRotateTo* create(float fDuration, float fAngle);
@@ -224,7 +225,7 @@ private:
 };
 
 
-class CCBRotateXTo: public cocos2d::ActionInterval
+class CC_DLL CCBRotateXTo: public cocos2d::ActionInterval
 {
 public:
     static CCBRotateXTo* create(float fDuration, float fAngle);
@@ -243,7 +244,7 @@ private:
 };
 
 
-class CCBRotateYTo: public cocos2d::ActionInterval
+class CC_DLL CCBRotateYTo: public cocos2d::ActionInterval
 {
 public:
     static CCBRotateYTo* create(float fDuration, float fAngle);
@@ -262,7 +263,7 @@ private:
 };
 
 
-class CCBEaseInstant : public cocos2d::ActionEase
+class CC_DLL CCBEaseInstant : public cocos2d::ActionEase
 {
 public:
     static CCBEaseInstant* create(cocos2d::ActionInterval *pAction);

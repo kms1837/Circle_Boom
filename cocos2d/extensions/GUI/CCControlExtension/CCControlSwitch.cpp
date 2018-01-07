@@ -129,7 +129,7 @@ ControlSwitchSprite* ControlSwitchSprite::create(Sprite *maskSprite,
                                             Label* onLabel,
                                             Label* offLabel)
 {
-    auto ret = new ControlSwitchSprite();
+    auto ret = new (std::nothrow) ControlSwitchSprite();
     ret->initWithMaskSprite(maskSprite, onSprite, offSprite, thumbSprite, onLabel, offLabel);
     ret->autorelease();
     return ret;
@@ -193,8 +193,12 @@ bool ControlSwitchSprite::initWithMaskSprite(
         
         clipper->addChild(onSprite);
         clipper->addChild(offSprite);
-        clipper->addChild(onLabel);
-        clipper->addChild(offLabel);
+        if (onLabel) {
+            clipper->addChild(onLabel); // might be null
+        }
+        if (offLabel) {
+            clipper->addChild(offLabel); // might be null
+        }
         clipper->addChild(thumbSprite);
         
         addChild(clipper);
@@ -218,27 +222,27 @@ void ControlSwitchSprite::updateTweenAction(float value, const std::string& key)
 
 void ControlSwitchSprite::needsLayout()
 {
-    _onSprite->setPosition(Vec2(_onSprite->getContentSize().width / 2 + _sliderXPosition,
-        _onSprite->getContentSize().height / 2));
-    _offSprite->setPosition(Vec2(_onSprite->getContentSize().width + _offSprite->getContentSize().width / 2 + _sliderXPosition, 
-        _offSprite->getContentSize().height / 2));
-    _thumbSprite->setPosition(Vec2(_onSprite->getContentSize().width + _sliderXPosition,
-        _maskTexture->getContentSize().height / 2));
+    _onSprite->setPosition(_onSprite->getContentSize().width / 2 + _sliderXPosition,
+        _onSprite->getContentSize().height / 2);
+    _offSprite->setPosition(_onSprite->getContentSize().width + _offSprite->getContentSize().width / 2 + _sliderXPosition,
+        _offSprite->getContentSize().height / 2);
+    _thumbSprite->setPosition(_onSprite->getContentSize().width + _sliderXPosition,
+        _maskTexture->getContentSize().height / 2);
 
-    _clipperStencil->setPosition(Vec2(_maskTexture->getContentSize().width/2,
-                                    _maskTexture->getContentSize().height / 2));
+    _clipperStencil->setPosition(_maskTexture->getContentSize().width/2,
+                                    _maskTexture->getContentSize().height / 2);
 
     if (_onLabel)
     {
         _onLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        _onLabel->setPosition(Vec2(_onSprite->getPosition().x - _thumbSprite->getContentSize().width / 6,
-            _onSprite->getContentSize().height / 2));
+        _onLabel->setPosition(_onSprite->getPosition().x - _thumbSprite->getContentSize().width / 6,
+            _onSprite->getContentSize().height / 2);
     }
     if (_offLabel)
     {
         _offLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        _offLabel->setPosition(Vec2(_offSprite->getPosition().x + _thumbSprite->getContentSize().width / 6,
-            _offSprite->getContentSize().height / 2));
+        _offLabel->setPosition(_offSprite->getPosition().x + _thumbSprite->getContentSize().width / 6,
+            _offSprite->getContentSize().height / 2);
     }
 
     setFlippedY(true);
@@ -296,7 +300,7 @@ bool ControlSwitch::initWithMaskSprite(Sprite *maskSprite, Sprite * onSprite, Sp
 
 ControlSwitch* ControlSwitch::create(Sprite *maskSprite, Sprite * onSprite, Sprite * offSprite, Sprite * thumbSprite)
 {
-    ControlSwitch* pRet = new ControlSwitch();
+    ControlSwitch* pRet = new (std::nothrow) ControlSwitch();
     if (pRet && pRet->initWithMaskSprite(maskSprite, onSprite, offSprite, thumbSprite, nullptr, nullptr))
     {
         pRet->autorelease();
@@ -326,10 +330,10 @@ bool ControlSwitch::initWithMaskSprite(Sprite *maskSprite, Sprite * onSprite, Sp
                                         onLabel,
                                         offLabel);
         _switchSprite->retain();
-        _switchSprite->setPosition(Vec2(_switchSprite->getContentSize().width / 2, _switchSprite->getContentSize().height / 2));
+        _switchSprite->setPosition(_switchSprite->getContentSize().width / 2, _switchSprite->getContentSize().height / 2);
         addChild(_switchSprite);
         
-        ignoreAnchorPointForPosition(false);
+        setIgnoreAnchorPointForPosition(false);
         setAnchorPoint(Vec2(0.5f, 0.5f));
         setContentSize(_switchSprite->getContentSize());
         return true;
@@ -339,7 +343,7 @@ bool ControlSwitch::initWithMaskSprite(Sprite *maskSprite, Sprite * onSprite, Sp
 
 ControlSwitch* ControlSwitch::create(Sprite *maskSprite, Sprite * onSprite, Sprite * offSprite, Sprite * thumbSprite, Label* onLabel, Label* offLabel)
 {
-    ControlSwitch* pRet = new ControlSwitch();
+    ControlSwitch* pRet = new (std::nothrow) ControlSwitch();
     if (pRet && pRet->initWithMaskSprite(maskSprite, onSprite, offSprite, thumbSprite, onLabel, offLabel))
     {
         pRet->autorelease();
@@ -396,7 +400,7 @@ Vec2 ControlSwitch::locationFromTouch(Touch* pTouch)
     return touchLocation;
 }
 
-bool ControlSwitch::onTouchBegan(Touch *pTouch, Event *pEvent)
+bool ControlSwitch::onTouchBegan(Touch *pTouch, Event* /*pEvent*/)
 {
     if (!isTouchInside(pTouch) || !isEnabled() || !isVisible())
     {
@@ -415,7 +419,7 @@ bool ControlSwitch::onTouchBegan(Touch *pTouch, Event *pEvent)
     return true;
 }
 
-void ControlSwitch::onTouchMoved(Touch *pTouch, Event *pEvent)
+void ControlSwitch::onTouchMoved(Touch *pTouch, Event* /*pEvent*/)
 {
     Vec2 location    = this->locationFromTouch(pTouch);
     location            = Vec2(location.x - _initialTouchXPosition, 0);
@@ -425,7 +429,7 @@ void ControlSwitch::onTouchMoved(Touch *pTouch, Event *pEvent)
     _switchSprite->setSliderXPosition(location.x);
 }
 
-void ControlSwitch::onTouchEnded(Touch *pTouch, Event *pEvent)
+void ControlSwitch::onTouchEnded(Touch *pTouch, Event* /*pEvent*/)
 {
     Vec2 location   = this->locationFromTouch(pTouch);
     
@@ -441,7 +445,7 @@ void ControlSwitch::onTouchEnded(Touch *pTouch, Event *pEvent)
     }
 }
 
-void ControlSwitch::onTouchCancelled(Touch *pTouch, Event *pEvent)
+void ControlSwitch::onTouchCancelled(Touch *pTouch, Event* /*pEvent*/)
 {
     Vec2 location   = this->locationFromTouch(pTouch);
     

@@ -30,17 +30,18 @@
 #include "base/CCEventListenerTouch.h"
 #include "2d/CCActionTween.h"
 #include "extensions/ExtensionMacros.h"
-
-NS_CC_EXT_BEGIN
+#include "extensions/ExtensionExport.h"
 
 /**
- * @addtogroup GUI
+ * @addtogroup ui
  * @{
  */
+NS_CC_EXT_BEGIN
+
 
 class ScrollView;
 
-class ScrollViewDelegate
+class CC_EX_DLL ScrollViewDelegate
 {
 public:
     /**
@@ -65,7 +66,7 @@ public:
  * ScrollView support for cocos2d-x.
  * It provides scroll view functionalities to cocos2d projects natively.
  */
-class ScrollView : public Layer, public ActionTweenDelegate
+class CC_EX_DLL  ScrollView : public Layer, public ActionTweenDelegate
 {
 public:
     enum class Direction
@@ -92,6 +93,7 @@ public:
     static ScrollView* create();
     /**
      * @js ctor
+     * @lua new
      */
     ScrollView();
     /**
@@ -100,7 +102,7 @@ public:
      */
     virtual ~ScrollView();
 
-    bool init();
+    bool init() override;
     /**
      * Returns a scroll view object
      *
@@ -126,6 +128,10 @@ public:
      * @param dt        The animation duration.
      */
     void setContentOffsetInDuration(Vec2 offset, float dt); 
+    /**
+     * Halts the movement animation of the inner content started with setContentOffset() or setContentOffsetInDuration()
+     */
+    void stopAnimatedContentOffset();
 
     void setZoomScale(float s);
     /**
@@ -145,6 +151,24 @@ public:
      * @param dt    The animation duration
      */
     void setZoomScaleInDuration(float s, float dt);
+
+    /**
+     * Set min scale
+     *
+     * @param minScale min scale
+     */
+    void setMinScale(float minScale) {
+        _minScale = minScale;
+    }
+    /**
+     * Set max scale
+     *
+     * @param maxScale max scale
+     */
+    void setMaxScale(float maxScale) {
+        _maxScale = maxScale;
+    }
+
     /**
      * Returns the current container's minimum offset. You may want this while you animate scrolling by yourself
      */
@@ -162,14 +186,17 @@ public:
     /**
      * Provided to make scroll view compatible with SWLayer's pause method
      */
+    using Layer::pause;  // fix warning
     void pause(Ref* sender);
     /**
      * Provided to make scroll view compatible with SWLayer's resume method
      */
+    using Layer::resume; // fix warning
     void resume(Ref* sender);
 
     void setTouchEnabled(bool enabled);
 	bool isTouchEnabled() const;
+    void setSwallowTouches(bool needSwallow);
     bool isDragging() const {return _dragging;}
     bool isTouchMoved() const { return _touchMoved; }
     bool isBounceable() const { return _bounceable; }
@@ -213,10 +240,10 @@ public:
     bool isClippingToBounds() { return _clippingToBounds; }
     void setClippingToBounds(bool bClippingToBounds) { _clippingToBounds = bClippingToBounds; }
 
-    virtual bool onTouchBegan(Touch *touch, Event *event);
-    virtual void onTouchMoved(Touch *touch, Event *event);
-    virtual void onTouchEnded(Touch *touch, Event *event);
-    virtual void onTouchCancelled(Touch *touch, Event *event);
+    virtual bool onTouchBegan(Touch *touch, Event *event) override;
+    virtual void onTouchMoved(Touch *touch, Event *event) override;
+    virtual void onTouchEnded(Touch *touch, Event *event) override;
+    virtual void onTouchCancelled(Touch *touch, Event *event) override;
     
     // Overrides
     virtual void setContentSize(const Size & size) override;
@@ -231,10 +258,15 @@ public:
     virtual void addChild(Node * child, int zOrder, int tag) override;
     virtual void addChild(Node * child, int zOrder, const std::string &name) override;
 
+    virtual void removeAllChildren() override;
+    virtual void removeAllChildrenWithCleanup(bool cleanup) override;
+    virtual void removeChild(Node* child, bool cleanup = true) override;
     /**
      * CCActionTweenDelegate
      */
-    void updateTweenAction(float value, const std::string& key);
+    void updateTweenAction(float value, const std::string& key) override;
+
+    bool hasVisibleParents() const;
 protected:
     /**
      * Relocates the container at the proper offset, in bounds of max/min offsets.
@@ -274,19 +306,7 @@ protected:
     void handleZoom();
 
     Rect getViewRect();
-    
-    /**
-     * current zoom scale
-     */
-    float _zoomScale;
-    /**
-     * min zoom scale
-     */
-    float _minZoomScale;
-    /**
-     * max zoom scale
-     */
-    float _maxZoomScale;
+
     /**
      * scroll view delegate
      */
@@ -308,7 +328,7 @@ protected:
      */
     Node* _container;
     /**
-     * Determiens whether user touch is moved after begin phase.
+     * Determines whether user touch is moved after begin phase.
      */
     bool _touchMoved;
     /**
@@ -363,11 +383,16 @@ protected:
     
     CustomCommand _beforeDrawCommand;
     CustomCommand _afterDrawCommand;
+
+    /**
+     * Action created with setContentOffsetInDuration(), saved so it can be halted
+     */
+    Action* _animatedScrollAction;
 };
 
-// end of GUI group
-/// @}
 
 NS_CC_EXT_END
+// end of ui group
+/// @}
 
 #endif /* __CCSCROLLVIEW_H__ */

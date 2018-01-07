@@ -3,15 +3,17 @@
 #
 # ./download-deps.py
 #
-# Download Cocos2D-X resources from github (https://github.com/cocos2d/cocos2d-x-3rd-party-libs-bin) and extract from ZIP
+# Downloads Cocos2D-x 3rd party dependencies from github:
+# https://github.com/cocos2d/cocos2d-x-3rd-party-libs-bin) and extracts the zip
+# file
 #
-# Helps prevent repo bloat due to large binary files since they can
-# be hosted separately.
+# Having the dependencies outside the official cocos2d-x repo helps prevent
+# bloating the repo.
 #
 
 """****************************************************************************
 Copyright (c) 2014 cocos2d-x.org
-Copyright (c) 2014 Chukong Technologies Inc.
+Copyright (c) 2014-2017 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -34,7 +36,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************"""
 
-import os.path,zipfile
+import os.path
+import zipfile
 import shutil
 import sys
 import traceback
@@ -48,14 +51,33 @@ from sys import stdout
 from distutils.errors import DistutilsError
 from distutils.dir_util import copy_tree, remove_tree
 
+
+def delete_folder_except(folder_path, excepts):
+    """
+    Delete a folder excepts some files/subfolders, `excepts` doesn't recursively which means it can not include
+    `subfoler/file1`. `excepts` is an array.
+    """
+    for file in os.listdir(folder_path):
+        if (file in excepts):
+            continue
+
+        full_path = os.path.join(folder_path, file)
+        if os.path.isdir(full_path):
+            shutil.rmtree(full_path)
+        else:
+            os.remove(full_path)
+
+
 class UnrecognizedFormat:
     def __init__(self, prompt):
         self._prompt = prompt
+
     def __str__(self):
         return self._prompt
 
+
 class CocosZipInstaller(object):
-    def __init__(self, workpath, config_path, version_path, remote_version_key = None):
+    def __init__(self, workpath, config_path, version_path, remote_version_key=None):
         self._workpath = workpath
         self._config_path = config_path
         self._version_path = version_path
@@ -64,6 +86,10 @@ class CocosZipInstaller(object):
 
         self._current_version = data["version"]
         self._repo_name = data["repo_name"]
+        try:
+            self._move_dirs = data["move_dirs"]
+        except:
+            self._move_dirs = None
         self._filename = self._current_version + '.zip'
         self._url = data["repo_parent"] + self._repo_name + '/archive/' + self._filename
         self._zip_file_size = int(data["zip_file_size"])
@@ -72,7 +98,7 @@ class CocosZipInstaller(object):
 
         try:
             data = self.load_json_file(version_path)
-            if remote_version_key == None:
+            if remote_version_key is None:
                 self._remote_version = data["version"]
             else:
                 self._remote_version = data[remote_version_key]
@@ -113,11 +139,13 @@ class CocosZipInstaller(object):
         file_size_dl = 0
         block_sz = 8192
         block_size_per_second = 0
-        old_time=time()
+        old_time = time()
 
+        status = ""
         while True:
             buffer = u.read(block_sz)
             if not buffer:
+                print("%s%s" % (" " * len(status), "\r")),
                 break
 
             file_size_dl += len(buffer)
@@ -126,16 +154,14 @@ class CocosZipInstaller(object):
             new_time = time()
             if (new_time - old_time) > 1:
                 speed = block_size_per_second / (new_time - old_time) / 1000.0
-                status = ""
                 if file_size != 0:
                     percent = file_size_dl * 100. / file_size
                     status = r"Downloaded: %6dK / Total: %dK, Percent: %3.2f%%, Speed: %6.2f KB/S " % (file_size_dl / 1000, file_size / 1000, percent, speed)
                 else:
                     status = r"Downloaded: %6dK, Speed: %6.2f KB/S " % (file_size_dl / 1000, speed)
-
-                status = status + chr(8)*(len(status)+1)
                 print(status),
                 sys.stdout.flush()
+                print("\r"),
                 block_size_per_second = 0
                 old_time = new_time
 
@@ -175,7 +201,7 @@ class CocosZipInstaller(object):
                 else:
                     # file
                     data = z.read(info.filename)
-                    f = open(target,'wb')
+                    f = open(target, 'wb')
                     try:
                         f.write(data)
                     finally:
@@ -188,15 +214,14 @@ class CocosZipInstaller(object):
             z.close()
             print("==> Extraction done!")
 
-
     def ask_to_delete_downloaded_zip_file(self):
-        ret = self.get_input_value("==> Whether to delete '%s' file? It may be reused when you execute this script next time! (yes/no): " % self._filename)
+        ret = self.get_input_value("==> Would you like to save '%s'? So you don't have to download it later. [Yes/no]: " % self._filename)
         ret = ret.strip()
-        if ret != 'yes' and ret != 'no':
-            print("==> Invalid answer, please answer 'yes' or 'no'!")
-            return self.ask_to_delete_downloaded_zip_file()
+        if ret != 'yes' and ret != 'y' and ret != 'no' and ret != 'n':
+            print("==> Saving the dependency libraries by default")
+            return False
         else:
-            return True if ret == 'yes' else False
+            return True if ret == 'no' or ret == 'n' else False
 
     def download_zip_file(self):
         if not os.path.isfile(self._filename):
@@ -230,7 +255,12 @@ class CocosZipInstaller(object):
             data = json.load(data_file)
         return data
 
-    def run(self, folder_for_extracting, remove_downloaded, force_update, download_only):
+    def clean_external_folder(self, external_folder):
+        print('==> Cleaning cocos2d-x/external folder ...')
+        # remove external except 'config.json'
+        delete_folder_except(external_folder, ['config.json'])
+
+    def run(self, workpath, folder_for_extracting, remove_downloaded, force_update, download_only):
         if not force_update and not self.need_to_update():
             print("==> Not need to update!")
             return
@@ -242,15 +272,24 @@ class CocosZipInstaller(object):
 
         if not download_only:
             self.unpack_zipfile(self._workpath)
-            print("==> Copying files...")
+
             if not os.path.exists(folder_for_extracting):
                 os.mkdir(folder_for_extracting)
+
+            self.clean_external_folder(folder_for_extracting)
+            print("==> Copying files...")
             distutils.dir_util.copy_tree(self._extracted_folder_name, folder_for_extracting)
+            if self._move_dirs is not None:
+                for srcDir in self._move_dirs.keys():
+                    distDir = os.path.join( os.path.join(workpath, self._move_dirs[srcDir]), srcDir)
+                    if os.path.exists(distDir):
+                        shutil.rmtree(distDir)
+                    shutil.move( os.path.join(folder_for_extracting, srcDir), distDir)
             print("==> Cleaning...")
             if os.path.exists(self._extracted_folder_name):
                 shutil.rmtree(self._extracted_folder_name)
             if os.path.isfile(self._filename):
-                if remove_downloaded != None:
+                if remove_downloaded is not None:
                     if remove_downloaded == 'yes':
                         os.remove(self._filename)
                 elif self.ask_to_delete_downloaded_zip_file():
@@ -267,6 +306,7 @@ def _check_python_version():
         return False
 
     return True
+
 
 def main():
     workpath = os.path.dirname(os.path.realpath(__file__))
@@ -293,13 +333,7 @@ def main():
     print("==> Prepare to download external libraries!")
     external_path = os.path.join(workpath, 'external')
     installer = CocosZipInstaller(workpath, os.path.join(workpath, 'external', 'config.json'), os.path.join(workpath, 'external', 'version.json'), "prebuilt_libs_version")
-    installer.run(external_path, opts.remove_downloaded, opts.force_update, opts.download_only)
-
-    print("=======================================================")
-    print("==> Prepare to download lua runtime binaries")
-    runtime_path = os.path.join(workpath, 'templates', 'lua-template-runtime', 'runtime')
-    installer = CocosZipInstaller(workpath, os.path.join(runtime_path, 'config.json'), os.path.join(runtime_path, 'version.json'))
-    installer.run(runtime_path, opts.remove_downloaded, opts.force_update, opts.download_only)
+    installer.run(workpath, external_path, opts.remove_downloaded, opts.force_update, opts.download_only)
 
 # -------------- main --------------
 if __name__ == '__main__':

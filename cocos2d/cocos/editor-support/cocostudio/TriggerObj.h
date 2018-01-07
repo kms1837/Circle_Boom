@@ -1,5 +1,5 @@
-/****************************************************************************
-Copyright (c) 2013-2014 Chukong Technologies Inc.
+﻿/****************************************************************************
+Copyright (c) 2013-2017 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -25,17 +25,14 @@ THE SOFTWARE.
 #ifndef __TRIGGEROBJ_H__
 #define __TRIGGEROBJ_H__
 
-#include "cocos2d.h"
-#include "CocoStudio.h"
-#include <vector>
+#include "editor-support/cocostudio/CocoStudio.h"
+#include "base/CCVector.h"
+#include "base/CCEventListenerCustom.h"
 
-namespace cocos2d {
-class EventListenerCustom;
-}
 
 namespace cocostudio {
 
-class BaseTriggerCondition : public cocos2d::Ref
+class CC_STUDIO_DLL BaseTriggerCondition : public cocos2d::Ref
 {
 protected:
     BaseTriggerCondition(void);
@@ -48,7 +45,7 @@ public:
     virtual void removeAll();
 };
 
-class BaseTriggerAction : public cocos2d::Ref
+class CC_STUDIO_DLL BaseTriggerAction : public cocos2d::Ref
 {
 protected:
     BaseTriggerAction(void);
@@ -62,7 +59,7 @@ public:
 };
 
 
-class TriggerObj : public cocos2d::Ref
+class CC_STUDIO_DLL TriggerObj : public cocos2d::Ref
 {
 public:
     TriggerObj(void);

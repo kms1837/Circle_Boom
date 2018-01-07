@@ -1,6 +1,6 @@
 /****************************************************************************
  Copyright (c) 2014 cocos2d-x.org
- Copyright (c) 2014 Chukong Technologies Inc.
+ Copyright (c) 2014-2017 Chukong Technologies Inc.
 
  http://www.cocos2d-x.org
 
@@ -23,15 +23,13 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#include "CCController.h"
+#include "base/CCController.h"
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 
-#include "ccMacros.h"
-#include "CCEventDispatcher.h"
-#include "CCEventController.h"
-#include "CCEventListenerController.h"
-#include "CCDirector.h"
+#include "base/CCEventDispatcher.h"
+#include "base/CCEventController.h"
+#include "base/CCDirector.h"
 
 NS_CC_BEGIN
 
@@ -49,6 +47,19 @@ Controller* Controller::getControllerByTag(int tag)
     return nullptr;
 }
 
+Controller* Controller::getControllerByDeviceId(int deviceId)
+{
+    for (auto controller : Controller::s_allController)
+    {
+        if (controller->_deviceId == deviceId)
+        {
+            return controller;
+        }
+    }
+    return nullptr;
+}
+
+
 void Controller::init()
 {
     for (int key = Key::JOYSTICK_LEFT_X; key < Key::KEY_MAX; ++key)
@@ -61,9 +72,9 @@ void Controller::init()
     }
 
     _eventDispatcher = Director::getInstance()->getEventDispatcher();
-    _connectEvent = new EventController(EventController::ControllerEventType::CONNECTION, this, false);
-    _keyEvent = new EventController(EventController::ControllerEventType::BUTTON_STATUS_CHANGED, this, 0);
-    _axisEvent = new EventController(EventController::ControllerEventType::AXIS_STATUS_CHANGED, this, 0);
+    _connectEvent = new (std::nothrow) EventController(EventController::ControllerEventType::CONNECTION, this, false);
+    _keyEvent = new (std::nothrow) EventController(EventController::ControllerEventType::BUTTON_STATUS_CHANGED, this, 0);
+    _axisEvent = new (std::nothrow) EventController(EventController::ControllerEventType::AXIS_STATUS_CHANGED, this, 0);
 }
 
 const Controller::KeyStatus& Controller::getKeyStatus(int keyCode)
@@ -114,4 +125,4 @@ void Controller::onAxisEvent(int axisCode, float value, bool isAnalog)
 
 NS_CC_END
 
-#endif // #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#endif // (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)

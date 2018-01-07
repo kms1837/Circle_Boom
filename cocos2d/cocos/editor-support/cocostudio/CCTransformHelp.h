@@ -1,5 +1,5 @@
-/****************************************************************************
-Copyright (c) 2013-2014 Chukong Technologies Inc.
+﻿/****************************************************************************
+Copyright (c) 2013-2017 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -25,8 +25,9 @@ THE SOFTWARE.
 #ifndef __CCTRANSFORMHELP_H__
 #define __CCTRANSFORMHELP_H__
 
-#include "cocostudio/CCArmatureDefine.h"
-#include "cocostudio/CCDatas.h"
+#include "editor-support/cocostudio/CCArmatureDefine.h"
+#include "editor-support/cocostudio/CCDatas.h"
+#include "editor-support/cocostudio/CocosStudioExport.h"
 
 namespace cocostudio {
 
@@ -35,7 +36,7 @@ namespace cocostudio {
  * @js NA
  * @lua NA
  */
-class  TransformHelp
+class CC_STUDIO_DLL TransformHelp
 {
 public:
     TransformHelp();

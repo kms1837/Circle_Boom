@@ -3,7 +3,7 @@ Copyright (c) 2010      Neophit
 Copyright (c) 2010      Ricardo Quesada
 Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2011      Zynga Inc.
-Copyright (c) 2013-2014 Chukong Technologies Inc.
+Copyright (c) 2013-2017 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -25,7 +25,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
-#include "CCTMXObjectGroup.h"
+#include "2d/CCTMXObjectGroup.h"
 #include "base/ccMacros.h"
 
 NS_CC_BEGIN
@@ -34,7 +34,6 @@ NS_CC_BEGIN
 
 TMXObjectGroup::TMXObjectGroup()
     : _groupName("")
-    , _positionOffset(Vec2::ZERO)
 {
 }
 

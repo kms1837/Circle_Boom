@@ -1,5 +1,5 @@
-/****************************************************************************
-Copyright (c) 2013-2014 Chukong Technologies Inc.
+﻿/****************************************************************************
+Copyright (c) 2013-2017 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -25,12 +25,13 @@ THE SOFTWARE.
 #ifndef __CCARMATURE_H__
 #define __CCARMATURE_H__
 
-#include "cocostudio/CCArmatureDefine.h"
-#include "cocostudio/CCBone.h"
-#include "cocostudio/CCBatchNode.h"
-#include "cocostudio/CCArmatureAnimation.h"
-#include "cocostudio/CCSpriteFrameCacheHelper.h"
-#include "cocostudio/CCArmatureDataManager.h"
+#include "editor-support/cocostudio/CCArmatureDefine.h"
+#include "editor-support/cocostudio/CCBone.h"
+#include "editor-support/cocostudio/CCBatchNode.h"
+#include "editor-support/cocostudio/CCArmatureAnimation.h"
+#include "editor-support/cocostudio/CCSpriteFrameCacheHelper.h"
+#include "editor-support/cocostudio/CCArmatureDataManager.h"
+#include "editor-support/cocostudio/CocosStudioExport.h"
 #include "math/CCMath.h"
 
 class b2Body;
@@ -67,7 +68,7 @@ CC_DEPRECATED_ATTRIBUTE typedef Armature CCArmature;
 CC_DEPRECATED_ATTRIBUTE typedef ArmatureDataManager CCArmatureDataManager;
 CC_DEPRECATED_ATTRIBUTE typedef cocos2d::tweenfunc::TweenType CCTweenType;
 
-class  Armature : public cocos2d::Node, public cocos2d::BlendProtocol
+class CC_STUDIO_DLL Armature : public cocos2d::Node, public cocos2d::BlendProtocol
 {
 
 public:
@@ -175,7 +176,7 @@ public:
      *  @lua NA
      */
     inline const cocos2d::BlendFunc &getBlendFunc(void) const override{ return _blendFunc; }
-	
+    
 
     /**
      * Set contentsize and Calculate anchor point.
@@ -183,6 +184,7 @@ public:
     virtual void updateOffsetPoint();
     virtual void setAnchorPoint(const cocos2d::Vec2& point) override;
     virtual const cocos2d::Vec2& getAnchorPointInPoints() const override;
+    virtual const cocos2d::Vec2& getOffsetPoints() const;
 
     virtual void setAnimation(ArmatureAnimation *animation);
     virtual ArmatureAnimation *getAnimation() const;
@@ -193,7 +195,7 @@ public:
 #if ENABLE_PHYSICS_BOX2D_DETECT || ENABLE_PHYSICS_CHIPMUNK_DETECT
     virtual void setColliderFilter(ColliderFilter *filter);
 #elif ENABLE_PHYSICS_SAVE_CALCULATED_VERTEX
-    virtual void drawContour();
+    CC_DEPRECATED_ATTRIBUTE virtual void drawContour();
 #endif
 
 

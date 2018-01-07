@@ -1,5 +1,5 @@
 /****************************************************************************
- Copyright (c) 2013-2014 Chukong Technologies Inc.
+ Copyright (c) 2013-2017 Chukong Technologies Inc.
 
  http://www.cocos2d-x.org
 
@@ -30,6 +30,11 @@ CustomCommand::CustomCommand()
 : func(nullptr)
 {
     _type = RenderCommand::Type::CUSTOM_COMMAND;
+}
+
+void CustomCommand::init(float depth, const cocos2d::Mat4 &modelViewTransform, uint32_t flags)
+{
+    RenderCommand::init(depth, modelViewTransform, flags);
 }
 
 void CustomCommand::init(float globalOrder)

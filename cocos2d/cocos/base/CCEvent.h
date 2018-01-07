@@ -1,5 +1,5 @@
 /****************************************************************************
- Copyright (c) 2013-2014 Chukong Technologies Inc.
+ Copyright (c) 2013-2017 Chukong Technologies Inc.
  
  http://www.cocos2d-x.org
  
@@ -26,22 +26,25 @@
 #ifndef __CCEVENT_H__
 #define __CCEVENT_H__
 
-#include <string>
-#include <stdint.h>
-
 #include "base/CCRef.h"
-#include "base/CCPlatformMacros.h"
+#include "platform/CCPlatformMacros.h"
+
+/**
+ * @addtogroup base
+ * @{
+ */
 
 NS_CC_BEGIN
 
 class Node;
 
-/**
- *   Base class of all kinds of events.
+/** @class Event
+ * @brief Base class of all kinds of events.
  */
-class Event : public Ref
+class CC_DLL Event : public Ref
 {
 public:
+    /** Type Event type.*/
     enum class Type
     {
         TOUCH,
@@ -49,38 +52,44 @@ public:
         ACCELERATION,
         MOUSE,
         FOCUS,
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
         GAME_CONTROLLER,
-#endif
         CUSTOM
     };
     
-protected:
+CC_CONSTRUCTOR_ACCESS:
     /** Constructor */
     Event(Type type);
 public:
-    /** Destructor */
+    /** Destructor.
+     */
     virtual ~Event();
 
-    /** Gets the event type */
-	inline Type getType() const { return _type; };
+    /** Gets the event type.
+     *
+     * @return The event type.
+     */
+    Type getType() const { return _type; }
     
-    /** Stops propagation for current event */
-    inline void stopPropagation() { _isStopped = true; };
+    /** Stops propagation for current event.
+     */
+    void stopPropagation() { _isStopped = true; }
     
-    /** Checks whether the event has been stopped */
-    inline bool isStopped() const { return _isStopped; };
+    /** Checks whether the event has been stopped.
+     *
+     * @return True if the event has been stopped.
+     */
+    bool isStopped() const { return _isStopped; }
     
-    /** @brief Gets current target of the event
-     *  @return The target with which the event associates.
-     *  @note It onlys be available when the event listener is associated with node. 
+    /** Gets current target of the event.
+     * @return The target with which the event associates.
+     * @note It's only available when the event listener is associated with node.
      *        It returns 0 when the listener is associated with fixed priority.
      */
-    inline Node* getCurrentTarget() { return _currentTarget; };
+    Node* getCurrentTarget() { return _currentTarget; }
     
 protected:
     /** Sets current target */
-    inline void setCurrentTarget(Node* target) { _currentTarget = target; };
+    void setCurrentTarget(Node* target) { _currentTarget = target; }
     
 	Type _type;     ///< Event type
     
@@ -92,5 +101,7 @@ protected:
 
 NS_CC_END
 
+// end of base group
+/// @}
 
 #endif // __CCEVENT_H__

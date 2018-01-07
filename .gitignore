@@ -1,0 +1,6 @@
+debug/
+Debug.win32/
+Relase.win32/
+backup/
+.vs/
+*.log

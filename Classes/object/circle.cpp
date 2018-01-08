@@ -1,52 +1,121 @@
-#include "ObjectCircle.h"
+#include "circle.h"
 
-using namespace cocos2d;
+using namespace std;
 
-Objectcircle::Circle* Objectcircle::Createcircle(std::string fileName)
-{
-    float moveX[4]={-1,1,-1,1};
-    float moveY[4]={1,1,-1,-1};
-    //float moveX[4]={-1, -0.8, 0.8, 1};
-    float moveSpeedSetting[3]={1, 1.3, 1.6};
-	int temp1, temp2, tempX, tempY,temp;
-    
-	Circle* newcircle = new Circle;
-	newcircle->next = NULL;
-	newcircle->prev = NULL;
-    newcircle->Mcir = CCSprite::create(fileName);
-    
-    Size size2 = CCDirector::getInstance()->getVisibleSize();
-	temp1 = size2.width - newcircle->Mcir->getContentSize().width;
-	temp2 = size2.height - newcircle->Mcir->getContentSize().height;
-    
-	do{
-		tempX = (rand()%temp1)+newcircle->Mcir->getContentSize().width;
-		tempY = (rand()%temp2)+newcircle->Mcir->getContentSize().height;
-	}while(tempX<30 || tempX>temp1 || tempY<30 || tempY>temp2);
-	
-	newcircle->Mcir->setPosition(tempX,tempY);
-    newcircle->timer = 0;
-    
-	temp = rand()%4;
-	newcircle->moveX = moveX[temp];
-	newcircle->moveY = moveY[temp];
-    
-	temp = rand()%2;
-	newcircle->moveSpeed = moveSpeedSetting[temp];
-    
-	return newcircle;
-}//원형리스트 노드생성
+USING_NS_CC;
 
-Objectcircle::ComboLabelNode* Objectcircle::Createcircle()
-{
-	ComboLabelNode* newcircle = new ComboLabelNode;
-	newcircle->next = NULL;
-	newcircle->prev = NULL;
+Circle* Circle::create(Scene* inScene) {
+	Circle* newCircle = new Circle;
+	newCircle->scene_ = inScene;
 
-	return newcircle;
+	return newCircle;
 }
 
-void Objectcircle::AppendCircle(Objectcircle::Circle** Head, Objectcircle::Circle* newCircle){
+void Circle::createCircle() {
+	createCircle("tempcircle.png");
+}
+
+void Circle::createCircle(string fileName) {
+	float setX, setY;
+	FadeIn *fade = FadeIn::create(0.5);
+
+	Size winSize = CCDirector::getInstance()->getVisibleSize();
+
+	circleObj* newCircle = new circleObj;
+	Sprite* newCircleSprite = Sprite::create(fileName);
+	
+	int innerX = winSize.width - newCircleSprite->getContentSize().width;
+	int innerY = winSize.height - newCircleSprite->getContentSize().height;
+
+	do {
+		setX = (rand() % innerX) + newCircleSprite->getContentSize().width;
+		setY = (rand() % innerY) + newCircleSprite->getContentSize().height;
+	} while (setX<30 || setX>innerX || setY<30 || setY>innerY);
+	// 화면 안쪽으로 구체 배치
+
+	newCircleSprite->setPosition(setX, setY);
+
+	newCircleSprite->setOpacity(0);
+	newCircle->sprite = newCircleSprite;
+
+	newCircle->movePosition.x = setMovePosition[rand() % 2];
+	newCircle->movePosition.y = setMovePosition[rand() % 2];
+
+	newCircle->moveSpeed = setMoveSpeed[rand() % 2];
+
+	newCircle->streak = MotionStreak::create(0.5, 3, 50, Color3B::WHITE, "paddle.png");
+
+	circleList_.push_back(newCircle);
+	scene_->addChild(newCircleSprite);
+	scene_->addChild(newCircle->streak);
+
+	newCircleSprite->runAction(fade);
+}// 구체 생성, scene에 추가, 리스트에 추가
+
+void Circle::running() {
+	Size winSize = CCDirector::getInstance()->getVisibleSize();
+
+	list<circleObj*>::iterator iter;
+	for (iter = circleList_.begin(); iter != circleList_.end(); iter++) {
+		Sprite* movedSprite = (*iter)->sprite;
+		Vec2 position = (*iter)->sprite->getPosition();
+
+		if (position.x > winSize.width || position.x < 0)
+			(*iter)->movePosition.x *= -1;
+		if (position.y > winSize.height || position.y < 0)
+			(*iter)->movePosition.y *= -1;
+
+		position.add((*iter)->movePosition);
+		movedSprite->setPosition(position);
+		(*iter)->streak->setPosition(position);
+	}
+}
+
+/*
+Circle* Circle::create(string fileName) {
+	Circle* newCircle = new Circle;
+
+	int temp1, temp2, tempX, tempY, temp;
+    
+	newCircle->circleList_ = new list<circleObj>;
+	
+	circleObj* headObj = new circleObj;
+	headObj->sprite = CCSprite::create(fileName);
+
+	circleList_->push_back(*headObj);
+    
+    Size size2 = CCDirector::getInstance()->getVisibleSize();
+	Sprite* headObjSprite = headObj->sprite;
+	temp1 = size2.width - headObjSprite->getContentSize().width;
+	temp2 = size2.height - headObjSprite->getContentSize().height;
+    
+	do {
+		tempX = (rand()%temp1) + headObjSprite->getContentSize().width;
+		tempY = (rand()%temp2) + headObjSprite->getContentSize().height;
+	} while(tempX<30 || tempX>temp1 || tempY<30 || tempY>temp2);
+	
+	headObjSprite->setPosition(tempX,tempY);
+	headObj->timer = 0;
+    
+	temp = rand()%4;
+	headObj->moveX = moveX[temp];
+	headObj->moveY = moveY[temp];
+    
+	temp = rand()%2;
+	headObj->moveSpeed = moveSpeedSetting[temp];
+    
+	return newCircle;
+}//원형리스트 노드생성
+*/
+/*
+list<Circle::comboLabelNode>* Circle::create()
+{
+	list<Circle::comboLabelNode>* circleList = new list<Circle::comboLabelNode>;
+
+	return circleList;
+}
+
+void Circle::append(Circle::Circle** Head, circle::Circle* newCircle){
 	if((*Head) == NULL){
 		*Head = newCircle;
 		(*Head)->next = *Head;
@@ -66,7 +135,7 @@ void Objectcircle::AppendCircle(Objectcircle::Circle** Head, Objectcircle::Circl
 	}
 }//리스트 노드연결
 
-void Objectcircle::AppendCircle(Objectcircle::ComboLabelNode** Head, Objectcircle::ComboLabelNode* newLabel){
+void circle::AppendCircle(circle::ComboLabelNode** Head, circle::ComboLabelNode* newLabel){
 	if((*Head) == NULL){
 		*Head = newLabel;
 		(*Head)->next = *Head;
@@ -86,7 +155,7 @@ void Objectcircle::AppendCircle(Objectcircle::ComboLabelNode** Head, Objectcircl
 	}
 }//리스트 노드연결2
 
-int Objectcircle::GetCircleCount(Circle* Head){
+int circle::GetCircleCount(Circle* Head){
     int count=0;
     if(Head!=NULL){
         Circle* searchNode = Head;
@@ -99,7 +168,7 @@ int Objectcircle::GetCircleCount(Circle* Head){
     return count;
 }//리스트의 노드수 카운터
 
-void Objectcircle::RemoveCircle(Circle* removeNode, Circle** Head){
+void circle::RemoveCircle(Circle* removeNode, Circle** Head){
     if(removeNode!=NULL&&*Head!=NULL){
         if(removeNode==*Head){
             if((*Head)->next == *Head){ //순환방지
@@ -132,7 +201,7 @@ void Objectcircle::RemoveCircle(Circle* removeNode, Circle** Head){
 }//리스트의 노드 제거
 
 
-void Objectcircle::RemoveCircle(ComboLabelNode* removeNode, ComboLabelNode** Head){
+void circle::RemoveCircle(ComboLabelNode* removeNode, ComboLabelNode** Head){
     if(removeNode==*Head){
         if((*Head)->next == *Head){ //순환방지
             (*Head)->next = NULL;
@@ -160,7 +229,7 @@ void Objectcircle::RemoveCircle(ComboLabelNode* removeNode, ComboLabelNode** Hea
     delete removeNode;
 }//리스트의 노드 제거2
 
-void Objectcircle::AllRemoveCircle(Circle** removeNode){
+void circle::AllRemoveCircle(Circle** removeNode){
     if(removeNode!=NULL){
         Circle* head = *removeNode;
         Circle* deleteNode;
@@ -176,13 +245,10 @@ void Objectcircle::AllRemoveCircle(Circle** removeNode){
     }
 }//리스트의 노드 모두제거
 
-void Objectcircle::FadeCircle(Circle** list, Layer* childScene, std::string fileName){
-	Objectcircle::Circle* temp;
+void circle::FadeCircle(Circle** list, Layer* childScene, std::string fileName){
+	circle::Circle* temp;
     //int moveSpeed[3] = {1, 0.8, 0.6};
 	Sprite* Spr_temp;
-    
-    /*cocos2d::extension::CCNodeLoaderLibrary *ccNodeLoaderLibrary = cocos2d::extension::CCNodeLoaderLibrary::newDefaultCCNodeLoaderLibrary();
-    ccNodeLoaderLibrary->registerCCNodeLoader("Bug1", Bug1Loader::loader());*/
     
     FadeIn *FadeBy = FadeIn::create(0.5);
 	temp = Createcircle(fileName); // A
@@ -206,7 +272,7 @@ void Objectcircle::FadeCircle(Circle** list, Layer* childScene, std::string file
     
 }//객체생성 및 페이드
 
-void Objectcircle::FlipCircle(Sprite* flipObject ,int x){
+void circle::FlipCircle(Sprite* flipObject ,int x){
     if(x==1)flipObject->setFlippedX(true);
     else    flipObject->setFlippedX(false);
-}
+}*/

@@ -16,6 +16,7 @@ void Circle::createCircle() {
 
 void Circle::createCircle(string fileName) {
 	float setX, setY;
+	bool flip;
 	FadeIn *fade = FadeIn::create(0.5);
 
 	Size winSize = CCDirector::getInstance()->getVisibleSize();
@@ -43,6 +44,9 @@ void Circle::createCircle(string fileName) {
 	newCircle->moveSpeed = setMoveSpeed[rand() % 2];
 
 	newCircle->streak = MotionStreak::create(1, 3, 70, Color3B::GREEN, "paddle.png");
+
+	flip = newCircle->movePosition.x == 1 ? true : false;
+	newCircleSprite->setFlippedX(flip);
 
 	circleList_.push_back(newCircle);
 	scene_->addChild(newCircleSprite, kSpriteDepth);
@@ -87,11 +91,12 @@ void Circle::styleClear() {
 
 void Circle::running() {
 	Size winSize = CCDirector::getInstance()->getVisibleSize();
+	bool flip = false;
 
 	list<circleObj*>::iterator iter;
 	for (auto circle : circleList_) {
 		Sprite* movedSprite = circle->sprite;
-		Vec2 position = circle->sprite->getPosition();
+		Vec2 position = movedSprite->getPosition();
 
 		if (position.x > winSize.width || position.x < 0)
 			circle->movePosition.x *= -1;
@@ -99,14 +104,12 @@ void Circle::running() {
 		if (position.y > winSize.height || position.y < 0)
 			circle->movePosition.y *= -1;
 
+		flip = circle->movePosition.x == 1 ? true : false;
+		movedSprite->setFlippedX(flip);
+
 		position.add(circle->movePosition);
+
 		movedSprite->setPosition(position);
 		circle->streak->setPosition(position);
 	}
 }// 구체 동작
-
-/*
-void circle::FlipCircle(Sprite* flipObject ,int x){
-    if(x==1)flipObject->setFlippedX(true);
-    else    flipObject->setFlippedX(false);
-}*/

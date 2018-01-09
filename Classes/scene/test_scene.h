@@ -3,7 +3,7 @@
 
 #include "cocos2d.h"
 #include "SimpleAudioEngine.h"
-#include "object\circle.h"
+#include "object\circle_manager.h"
 #include <list>
 
 class TestScene: public cocos2d::Scene
@@ -38,7 +38,7 @@ private:
 	void pause();
 	void gameOver();
 
-	Circle* circles_;
+	CircleManager* circles_;
 
 	int score_;
 	int combo_;

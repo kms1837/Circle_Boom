@@ -29,7 +29,7 @@ bool TestScene::init() {
 	Size winSize = Director::getInstance()->getWinSize();
 
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("sound/SHORT_BGM_09.mp3");
-	circles_ = Circle::create(this);
+	circles_ = CircleManager::create(this);
 
 	int margin = 30;
 

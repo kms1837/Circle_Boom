@@ -56,15 +56,11 @@ bool Utility::inpoly(list<Vec2> poly, Vec2 checkPoint)
 		newPoint = point;
 
 		if (newPoint.x > oldPoint.x) {
-			point1.x = oldPoint.x;
-			point2.x = newPoint.x;
-			point1.y = oldPoint.y;
-			point2.y = newPoint.y;
+			point1 = oldPoint;
+			point2 = newPoint;
 		} else {
-			point1.x = newPoint.x;
-			point2.x = oldPoint.x;
-			point1.y = newPoint.y;
-			point2.y = oldPoint.y;
+			point1 = newPoint;
+			point2 = newPoint;
 		}
 		if ((newPoint.x < checkPoint.x) == (checkPoint.x <= oldPoint.x)
 			&& ((long)checkPoint.y - (long)point1.y)*(long)(point2.x - point1.x)

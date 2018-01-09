@@ -1,5 +1,6 @@
 #include <list>
 #include "cocos2d.h"
+#include "common\utility.h"
 
 class Circle
 {
@@ -13,39 +14,26 @@ public:
 
 		float moveSpeed; // 이동 속도
 	};
-    /*
-    struct comboLabelNode{
-        cocos2d::Label* comboLable;
-		comboLabelNode* next;
-		comboLabelNode* prev;
-        
-        int nodenumber;
-    };*/
     
 	static Circle* create(cocos2d::Scene*);
 
+	// util
 	void createCircle();
 	void createCircle(std::string fileName);
+	void styleClear();
 	void running();
 
-	//static Circle* create(std::string fileName); // 리스트 생성
-	
-	/*
-	void append(circleObj** Head, circleObj* newCircle);  //리스트에 구체추가
-    void append(comboLabelNode** Head, comboLabelNode* newCircle);
-    
-    void RemoveCircle(Circle* removeNode, Circle** Head); //구체삭제
-    void RemoveCircle(ComboLabelNode* removeNode, ComboLabelNode** Head);
-    
-    void AllRemoveCircle(Circle** removeNode);
-    //구체를 전체삭제하는 함수
-    void FadeCircle(Circle** List, cocos2d::Layer* childScene, std::string fileName);
-    //페이드인을 하며 구체를 생성하고 리스트에 추가하는 함수
-    void FlipCircle(cocos2d::Sprite* flipObject ,int x);
-    //구체를 뒤집는 함수
-    int GetCircleCount(Circle* Head);
-    //구체수를 세는 함수*/
+	// getter & setter
+	std::list<circleObj*> getCircles();
+	std::list<circleObj*> getInnerCircles(std::list<cocos2d::Vec2> points);
+
+	void remove(circleObj* removeCircle);
+
 private:
+	const int kSpriteDepth = 2;
+	const int kStreakDepth = 1;
+	const std::string kDeadEffect = "ExplodingRing.plist";
+
 	std::list<circleObj*> circleList_;
 	cocos2d::Scene* scene_;
 

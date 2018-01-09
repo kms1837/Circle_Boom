@@ -39,3 +39,40 @@ Document Utility::loadJson(char* fileName) {
 
 	return document;
 }
+
+bool Utility::inpoly(list<Vec2> poly, Vec2 checkPoint)
+{
+	Vec2 oldPoint, newPoint;
+	Vec2 point1, point2;
+	bool inside = false;
+
+	if (poly.size() < 3) {
+		return false;
+	}
+
+	oldPoint = *(poly.begin());
+
+	for (auto point : poly) {
+		newPoint = point;
+
+		if (newPoint.x > oldPoint.x) {
+			point1.x = oldPoint.x;
+			point2.x = newPoint.x;
+			point1.y = oldPoint.y;
+			point2.y = newPoint.y;
+		} else {
+			point1.x = newPoint.x;
+			point2.x = oldPoint.x;
+			point1.y = newPoint.y;
+			point2.y = oldPoint.y;
+		}
+		if ((newPoint.x < checkPoint.x) == (checkPoint.x <= oldPoint.x)
+			&& ((long)checkPoint.y - (long)point1.y)*(long)(point2.x - point1.x)
+			< ((long)point2.y - (long)point1.y)*(long)(checkPoint.x - point1.x)) {
+			inside = !inside;
+		}
+		oldPoint = newPoint;
+	}
+
+	return inside;
+}//다각형 안의 점 판단(Crossing Count Algorithm)

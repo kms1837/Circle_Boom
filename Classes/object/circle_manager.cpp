@@ -11,7 +11,7 @@ CircleManager* CircleManager::create(Scene* inScene) {
 }
 
 void CircleManager::createCircle() {
-	createCircle("tempcircle.png");
+	createCircle("circle_90.png");
 }
 
 void CircleManager::createCircle(string fileName) {
@@ -53,18 +53,29 @@ void CircleManager::createCircle(string fileName) {
 	newCircleSprite->runAction(fade);
 }// 구체 생성, scene에 추가, 리스트에 추가
 
-void CircleManager::remove(Circle* removeCircle) {
+void CircleManager::removeCircle(Circle* removeCircle) {
 	ParticleSystemQuad* particle = ParticleSystemQuad::create(kDeadEffect);
 	particle->setPosition(removeCircle->sprite->getPosition());
 	scene_->addChild(particle);
-
+	
 	scene_->removeChild(removeCircle->sprite);
 	scene_->removeChild(removeCircle->streak);
 	circleList_.remove(removeCircle);
 }
 
+void CircleManager::remove() {
+	auto removeList = circleList_;
+	for (auto circle : removeList) {
+		removeCircle(circle);
+	}
+}
+
 list<Circle*> CircleManager::getCircles() {
 	return circleList_;
+}
+
+int CircleManager::getSize() {
+	return circleList_.size();
 }
 
 list<Circle*> CircleManager::getInnerCircles(list<Vec2> points) {

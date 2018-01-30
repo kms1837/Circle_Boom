@@ -10,7 +10,7 @@ class CircleManager
 public:    
 	static CircleManager* create(cocos2d::Scene*);
 
-	// util
+	// utils
 	void createCircle();
 	void createCircle(std::string fileName);
 	void styleClear();
@@ -19,8 +19,10 @@ public:
 	// getter & setter
 	std::list<Circle*> getCircles();
 	std::list<Circle*> getInnerCircles(std::list<cocos2d::Vec2> points);
+	int getSize();
 
-	void remove(Circle* removeCircle);
+	void removeCircle(Circle* removeCircle);
+	void remove();
 
 private:
 	const int kSpriteDepth = 2;

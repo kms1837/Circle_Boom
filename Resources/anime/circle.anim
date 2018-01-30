@@ -1,0 +1,126 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "circle",
+  "_objFlags": 0,
+  "_rawFiles": null,
+  "_duration": 0.75,
+  "sample": 60,
+  "speed": 1,
+  "wrapMode": 1,
+  "curveData": {
+    "props": {
+      "position": []
+    },
+    "paths": {
+      "hand_25": {
+        "props": {
+          "position": []
+        }
+      },
+      "circle_90": {
+        "props": {
+          "position": []
+        }
+      },
+      "hand_25_L": {
+        "props": {
+          "position": [
+            {
+              "frame": 0,
+              "value": [
+                431.7,
+                344
+              ],
+              "curve": "cubicOut"
+            },
+            {
+              "frame": 0.25,
+              "value": [
+                452.1,
+                340.9
+              ]
+            },
+            {
+              "frame": 0.4166666666666667,
+              "value": [
+                452.1,
+                340.9
+              ],
+              "curve": [
+                0.4,
+                0,
+                0.86,
+                0.42
+              ]
+            },
+            {
+              "frame": 0.75,
+              "value": [
+                421.2,
+                360.9
+              ],
+              "curve": "linear"
+            }
+          ]
+        },
+        "comps": {
+          "cc.Sprite": {}
+        }
+      },
+      "hand_25_R": {
+        "props": {
+          "position": [
+            {
+              "frame": 0,
+              "value": [
+                516.7,
+                341.5
+              ],
+              "curve": "cubicOut"
+            },
+            {
+              "frame": 0.25,
+              "value": [
+                497.1,
+                340
+              ],
+              "curve": "linear"
+            },
+            {
+              "frame": 0.4166666666666667,
+              "value": [
+                497.1,
+                340
+              ],
+              "curve": [
+                0.4,
+                0,
+                0.87,
+                0.37
+              ]
+            },
+            {
+              "frame": 0.75,
+              "value": [
+                525.8,
+                333.2
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "events": [
+    {
+      "frame": 0.5,
+      "func": "",
+      "params": []
+    },
+    {
+      "frame": 0.5833333333333334,
+      "func": "",
+      "params": []
+    }
+  ]
+}

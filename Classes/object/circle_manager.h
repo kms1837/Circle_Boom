@@ -10,9 +10,10 @@ class CircleManager
 public:    
 	static CircleManager* create(cocos2d::Scene*);
 
+	CircleManager();
+
 	// utils
 	void createCircle();
-	void createCircle(std::string fileName);
 	void styleClear();
 	void running();
 
@@ -25,13 +26,10 @@ public:
 	void remove();
 
 private:
-	const int kSpriteDepth = 2;
-	const int kStreakDepth = 1;
-	const std::string kDeadEffect = "ExplodingRing.plist";
+	const int spriteLayer;
+	const int streakLayer;
+	const std::string _dieEffectFile;
 
-	std::list<Circle*> circleList_;
-	cocos2d::Scene* scene_;
-
-	double setMovePosition[2] = { -1, 1 };
-	double setMoveSpeed[3] = { 1, 1.3, 1.6 };
+	std::list<Circle*> _circleList;
+	cocos2d::Scene* _scene;
 };
